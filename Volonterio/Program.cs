@@ -8,6 +8,7 @@ using System.Text;
 using Volonterio.Data;
 using Volonterio.Data.Entities;
 using Volonterio.Data.Services;
+using Volonterio.Mappers;
 using Volonterio.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +53,7 @@ builder.Services.AddAuthentication((AuthenticationOptions opts) => {
     });
 
 builder.Services.AddScoped<IJwtBearerService, JwtBearerService>();
+builder.Services.AddAutoMapper(typeof(UserMapper));
 
 builder.Services.AddCors();
 
