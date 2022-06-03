@@ -1,8 +1,14 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Volonterio.Data;
 using Volonterio.Data.Entities;
+using Volonterio.Data.Services;
+using Volonterio.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +33,26 @@ builder.Services.AddIdentity<AppUser, AppRole>((IdentityOptions opts) => {
     .AddEntityFrameworkStores<EFContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddAuthentication((AuthenticationOptions opts) => {
+    opts.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opts.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer((JwtBearerOptions jwt) => {
+        jwt.RequireHttpsMetadata = false;
+        jwt.SaveToken = true;
+        jwt.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateLifetime = false,
+            ValidateIssuer = true,
+            ValidateIssuerSigningKey = true,
+            ValidateAudience = false,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                builder.Configuration.GetValue<string>("private_key")))
+        };
+    });
+
+builder.Services.AddScoped<IJwtBearerService, JwtBearerService>();
+
 builder.Services.AddCors();
 
 var app = builder.Build();
@@ -37,6 +63,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.SeedAll();
 
 ForwardedHeadersOptions opts = new ForwardedHeadersOptions
 {
