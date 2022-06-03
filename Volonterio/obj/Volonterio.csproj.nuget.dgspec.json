@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Denis\\Desktop\\Дипломна робота\\backend\\Volonterio\\Volonterio\\Volonterio.csproj": {}
+    "D:\\backend\\Volonterio\\Volonterio\\Volonterio.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Denis\\Desktop\\Дипломна робота\\backend\\Volonterio\\Volonterio\\Volonterio.csproj": {
+    "D:\\backend\\Volonterio\\Volonterio\\Volonterio.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Denis\\Desktop\\Дипломна робота\\backend\\Volonterio\\Volonterio\\Volonterio.csproj",
+        "projectUniqueName": "D:\\backend\\Volonterio\\Volonterio\\Volonterio.csproj",
         "projectName": "Volonterio",
-        "projectPath": "C:\\Users\\Denis\\Desktop\\Дипломна робота\\backend\\Volonterio\\Volonterio\\Volonterio.csproj",
+        "projectPath": "D:\\backend\\Volonterio\\Volonterio\\Volonterio.csproj",
         "packagesPath": "C:\\Users\\Denis\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Denis\\Desktop\\Дипломна робота\\backend\\Volonterio\\Volonterio\\obj\\",
+        "outputPath": "D:\\backend\\Volonterio\\Volonterio\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -45,6 +45,24 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[6.0.5, )"
+            },
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[6.0.5, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.5, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[6.0.4, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.2.3, )"
