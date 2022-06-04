@@ -29,7 +29,8 @@ namespace Volonterio.Controllers
         {
             IActionResult res = Ok();
             AppUser user = _mapper.Map<AppUser>(register);
-            user.Image = "";
+            
+
             return await Task.Run(() => {
                 
                 var userFind = _userManager.FindByEmailAsync(user.Email).Result;
@@ -73,8 +74,40 @@ namespace Volonterio.Controllers
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginUserModel login) 
         {
-            return await Task.Run(() => {
-                return Ok();
+            IActionResult res = null;
+            return await Task.Run(async () => {
+               
+                var user = await _userManager.FindByEmailAsync(login.Email);
+                
+                if (user == null) 
+                {
+                    res = BadRequest(new
+                    {
+                        Errors = new
+                        {
+                            Email = new string[] { "Користувача не існує!" }
+                        }
+                    });
+                    return res;
+                }
+
+                if (!(await _userManager.CheckPasswordAsync(user, login.Password))) 
+                {
+                    res = BadRequest(new
+                    {
+                        Errors = new
+                        {
+                            Password = new string[] { "Пароль не правильний!" }
+                        }
+                    });
+                    return res;
+                }
+
+                res = Ok(new
+                {
+                    token = _jwtBearer.GenerateToken(user)
+                }) ;
+                return res;
             });
         }
     }

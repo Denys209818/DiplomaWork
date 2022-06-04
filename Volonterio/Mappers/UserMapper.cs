@@ -14,7 +14,7 @@ namespace Volonterio.Mappers
                 .ForMember(x => x.FirstName, y => y.MapFrom(z => z.FirstName))
                 .ForMember(x => x.PhoneNumber, y => y.MapFrom(z => z.Phone))
                 .ForMember(x => x.SecondName, y => y.MapFrom(z => z.SecondName))
-                .ForMember(x => x.Image, y => y.Ignore());
+                .ForMember(x => x.Image, y => y.MapFrom(z => "default.jpg"));
         }
     }
 }
