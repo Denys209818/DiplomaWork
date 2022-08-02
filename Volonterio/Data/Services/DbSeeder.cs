@@ -141,6 +141,35 @@ namespace Volonterio.Data.Services
                 context.publicationsTagsModels.AddRange(publicationstags);
                 context.SaveChanges();
             }
+
+            if (!context.usersModels.Any())
+            {
+                var users = new List<UsersModels>()
+                {
+                    new UsersModels
+                    {
+                        Email = "TestEmail@gmail.com",
+                        FirstName = "Петро",
+                        SecondName = "Бампер",
+                        Image = "petro.jpg",
+                        Phone = "098-123-45-67",
+                        Password = "password",
+                        GroupsId = 1
+                    },
+                    new UsersModels
+                    {
+                        Email = "TestEmail_1@gmail.com",
+                        FirstName = "Дмитро",
+                        SecondName = "Чайник",
+                        Image = "4ainik.jpg",
+                        Phone = "098-003-45-89",
+                        Password = "password1-",
+                        GroupsId = 2
+                    }
+                };
+                context.usersModels.AddRange(users);
+                context.SaveChanges();
+            }
         }
 
         

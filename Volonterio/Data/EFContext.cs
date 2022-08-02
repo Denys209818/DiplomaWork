@@ -15,6 +15,7 @@ namespace Volonterio.Data
         public DbSet<TagsModels> tagsModels { get; set; }
         public DbSet<PublicationsTagsModel> publicationsTagsModels { get; set; }
         public DbSet<GroupsModels> groupsModels { get; set; }
+        public DbSet<UsersModels> usersModels { get; set; }
 
 #pragma warning disable CS8618 // Поле, не допускающее значения NULL, должно содержать значение, отличное от NULL, при выходе из конструктора. Возможно, стоит объявить поле как допускающее значения NULL.
         public EFContext(DbContextOptions opts) : base(opts)
@@ -44,6 +45,12 @@ namespace Volonterio.Data
                 aspnetroles.HasKey(asp => new { asp.Id });
                 aspnetroles.HasOne(asp => asp.idgroups).WithMany(a => a.IdgroupsPublications).HasForeignKey(a => a.GroupsId).IsRequired();
 
+            });
+
+            builder.Entity<UsersModels>(aspnetrpoles =>
+            {
+                aspnetrpoles.HasKey(asp => new { asp.Id });
+                aspnetrpoles.HasOne(asp => asp.idgroups).WithMany(a => a.IdGroupsUsers).HasForeignKey(a => a.GroupsId).IsRequired();
             });
         }
     }

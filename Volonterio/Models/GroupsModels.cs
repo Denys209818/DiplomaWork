@@ -17,5 +17,6 @@ namespace Volonterio.Models
         public string Target { get; set; }
 
         public virtual ICollection<PublicationsModels> IdgroupsPublications { get; set; }
+        public virtual ICollection<UsersModels> IdGroupsUsers { get; set; }
     }
 }
