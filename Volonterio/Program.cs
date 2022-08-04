@@ -1,8 +1,10 @@
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Volonterio.Data;
@@ -19,6 +21,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<Program>());
 
 builder.Services.AddDbContext<EFContext>((DbContextOptionsBuilder b) => {
     b.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -81,6 +85,18 @@ app.UseForwardedHeaders(opts);
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+string dir = Path.Combine(Directory.GetCurrentDirectory(), "Images");
+if(!Directory.Exists(dir))
+{
+    Directory.CreateDirectory(dir);
+}
+
+app.UseStaticFiles(new StaticFileOptions { 
+
+    FileProvider = new PhysicalFileProvider(dir),
+    RequestPath = "/Images"
+});
 
 
 app.MapControllers();

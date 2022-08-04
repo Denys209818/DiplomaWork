@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Volonterio.Data;
@@ -11,9 +12,10 @@ using Volonterio.Data;
 namespace Volonterio.Migrations
 {
     [DbContext(typeof(EFContext))]
-    partial class EFContextModelSnapshot : ModelSnapshot
+    [Migration("20220803173308_Add app entities")]
+    partial class Addappentities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -313,9 +315,6 @@ namespace Volonterio.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("GroupId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasMaxLength(4000)
@@ -327,8 +326,6 @@ namespace Volonterio.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GroupId");
 
                     b.ToTable("tblAppPost", (string)null);
                 });
@@ -643,17 +640,6 @@ namespace Volonterio.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppPost", b =>
-                {
-                    b.HasOne("Volonterio.Data.Entities.CustomEntities.AppGroup", "Group")
-                        .WithMany("Posts")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Group");
-                });
-
             modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppPostImage", b =>
                 {
                     b.HasOne("Volonterio.Data.Entities.CustomEntities.AppPost", "Post")
@@ -744,8 +730,6 @@ namespace Volonterio.Migrations
 
             modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppGroup", b =>
                 {
-                    b.Navigation("Posts");
-
                     b.Navigation("Tags");
                 });
 

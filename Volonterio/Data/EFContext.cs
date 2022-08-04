@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Volonterio.Data.Configuration;
 using Volonterio.Data.Configuration.Identity;
 using Volonterio.Data.Entities;
+using Volonterio.Data.Entities.CustomEntities;
 using Volonterio.Models;
 
 namespace Volonterio.Data
@@ -17,20 +19,39 @@ namespace Volonterio.Data
         public DbSet<GroupsModels> groupsModels { get; set; }
         public DbSet<UsersModels> usersModels { get; set; }
 
-#pragma warning disable CS8618 // Поле, не допускающее значения NULL, должно содержать значение, отличное от NULL, при выходе из конструктора. Возможно, стоит объявить поле как допускающее значения NULL.
+
+        /// <summary>
+        /// App entities
+        /// </summary>
+        public DbSet<AppGroup> Groups { get; set; }
+        public DbSet<AppTag> Tags { get; set; }
+        public DbSet<AppPostImage> PostImages { get; set; }
+        public DbSet<AppPostTag> PostTags { get; set; }
+        public DbSet<AppPost> Post { get; set; }
+        public DbSet<AppUserFriend> UserFriends { get; set; }
+        public DbSet<AppFriend> Friends { get; set; }
+
         public EFContext(DbContextOptions opts) : base(opts)
-#pragma warning restore CS8618 // Поле, не допускающее значения NULL, должно содержать значение, отличное от NULL, при выходе из конструктора. Возможно, стоит объявить поле как допускающее значения NULL.
         {
         
-       }
+        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
             builder.ApplyConfiguration(new IdentityConfiguration());
+            builder.ApplyConfiguration(new GroupConfiguration());
+            builder.ApplyConfiguration(new TagConfiguration());
+            builder.ApplyConfiguration(new PostImageConfiguration());
+            builder.ApplyConfiguration(new PostConfiguration());
+            builder.ApplyConfiguration(new PostTagConfiguration());
+            builder.ApplyConfiguration(new UserFriendConfiguration());
+            builder.ApplyConfiguration(new FriendConfiguration());
 
-            base.OnModelCreating(builder);
+
+
+
             builder.Entity<PublicationsTagsModel>(aspnetroles =>
             {
                 aspnetroles.HasKey(asp => new { asp.PublicationsId, asp.TegsId });
@@ -52,6 +73,10 @@ namespace Volonterio.Data
                 aspnetrpoles.HasKey(asp => new { asp.Id });
                 aspnetrpoles.HasOne(asp => asp.idgroups).WithMany(a => a.IdGroupsUsers).HasForeignKey(a => a.GroupsId).IsRequired();
             });
+
+
+
+        
         }
     }
 }

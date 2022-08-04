@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing;
 using Volonterio.Constants;
 using Volonterio.Data;
 using Volonterio.Data.Entities;
@@ -27,7 +28,7 @@ namespace Volonterio.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromForm] RegisterUserModel register)
+        public async Task<IActionResult> Register([FromBody] RegisterUserModel register)
         {
             IActionResult res = Ok();
             AppUser user = _mapper.Map<AppUser>(register);
@@ -40,17 +41,30 @@ namespace Volonterio.Controllers
                 if (userFind == null)
                 {
                     var r = _userManager.CreateAsync(user, register.Password).Result;
-                    var rolRes = _userManager.AddToRoleAsync(user, Roles.USER).Result;
-                    if (!r.Succeeded)
+                    if (r.Succeeded)
                     {
+
+                        var rolRes = _userManager.AddToRoleAsync(user, Roles.USER).Result;
+                        if (!r.Succeeded)
+                        {
+                            res = BadRequest(new
+                            {
+                                Errors = new
+                                {
+                                    Email = new string[] { "Помилка авторизації користувача!" }
+                                }
+                            });
+                            return res;
+                        }
+                    }else
+                    {
+                        
                         res = BadRequest(new
                         {
-                            Errors = new
-                            {
-                                Email = new string[] { "Помилка авторизації користувача!" }
-                            }
+                            Errors = r.Errors.Select(x => "Code: " + x.Code + "; Description: " + x.Description).ToList()
                         });
                         return res;
+
                     }
 
 
@@ -117,5 +131,189 @@ namespace Volonterio.Controllers
                 return res;
             });
         }
+
+        [HttpPost]
+        [Route("update")]
+        public async Task<IActionResult> Update([FromBody] EditUserModel edit)
+        {
+            IActionResult res = Ok("Дані змінено!");
+            return await Task.Run(() =>
+            {
+                var user = _userManager.FindByEmailAsync(edit.Email).Result;
+                if (user == null)
+                {
+
+                    res = BadRequest(new
+                    {
+                        Errors = new
+                        {
+                            Message = "Користувача не існує!"
+                        }
+                    });
+                    return res;
+                }
+                else 
+                {
+                    user.FirstName = edit.FirstName;
+                    user.SecondName = edit.SecondName;
+                    user.PhoneNumber = edit.PhoneNumber;
+
+                    var upd = _userManager.UpdateAsync(user).Result;
+                    if(!upd.Succeeded)
+                    {
+                        res = BadRequest(new
+                        {
+                            Errors = upd.Errors.Select(x => "Code: " + x.Code + "; Description: " + x.Description)
+                        });
+                        return res;
+                    }
+
+                    if(!edit.OldPassword.ToLower().Equals(edit.Password.ToLower()))
+                    {
+                        if(edit.Password.ToLower().Equals(edit.ConfirmPassword.ToLower()))
+                        {
+
+                            var changed = _userManager.ChangePasswordAsync(user, edit.OldPassword, edit.Password).Result;   
+                            if(!changed.Succeeded)
+                            {
+                                res = BadRequest(new
+                                {
+                                    Errors = changed.Errors.Select(x => "Code: " + x.Code + "; Description: " + x.Description)
+                                });
+                                return res;
+                            }
+                        }else
+                        {
+                            res = BadRequest(new
+                            {
+                                Errors = new
+                                {
+                                    Message = "Паролі не співпадають!"
+                                }
+                            });
+                            return res;
+                        }
+                    }else
+                    {
+                        res = BadRequest(new
+                        {
+                            Errors = new
+                            {
+                                Message = "Паролі співпадають!"
+                            }
+                        });
+                        return res;
+                    }
+                    
+                }
+                return res;
+            });
+        }
+
+        [HttpPost]
+        [Route("remove")]
+        public async Task<IActionResult> RemoveUser([FromBody] RemoveUserModel remove) 
+        {
+            IActionResult res = Ok("Користувача видалено!");
+            return await Task.Run(() =>
+            {
+                var user = _userManager.FindByEmailAsync(remove.Email).Result;
+                if(user != null)
+                {
+                    var del = _userManager.DeleteAsync(user).Result;
+                    if(!del.Succeeded)
+                    {
+                        res = BadRequest(new
+                        {
+                            Errors = del.Errors.Select(x => "Code: " + x.Code + "; Descrption: " + x.Description).ToList()
+                        });
+
+                        return res;
+                    }
+                }else
+                {
+                    res = BadRequest(new
+                    {
+                        Errors = "Користувача не існує!"
+                    });
+
+                    return res;
+                }
+                return res;
+            });
+        }
+
+        [HttpPost]
+        [Route("changeimage")]
+        public async Task<IActionResult> ChangeImage([FromBody] ChangeImageUserModel changeImage)
+        {
+            IActionResult res = Ok("Фотографію змінено!");
+            return await Task.Run(() =>
+            {
+                if(changeImage.ImageBase64 != null)
+                {
+                    var user = _userManager.FindByEmailAsync(changeImage.Email).Result;
+
+                    if(user != null)
+                    {
+                        string fileName = Path.GetRandomFileName() + ".jpg";
+                        string newFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Images");
+                        string filePath = Path.Combine(newFilePath, fileName);
+
+                        try
+                        {
+                            string fileNameOld = Path.Combine(Directory.GetCurrentDirectory(), "Images", user.Image);
+                            if(System.IO.File.Exists(fileNameOld))
+                            {
+                                System.IO.File.Delete(fileNameOld);
+                            }
+
+                            Bitmap bmp = ImageWorker.ConvertToBitmap(changeImage.ImageBase64);
+                            bmp.Save(filePath);
+
+                            user.Image = fileName;
+                            var upd = _userManager.UpdateAsync(user).Result;
+                            if(!upd.Succeeded)
+                            {
+                                res = BadRequest(new
+                                {
+                                    Errors = upd.Errors.Select(x => "Code: " + x.Code + "; Description: " + x.Description)
+                                });
+                                return res;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            res = BadRequest(new
+                            {
+                                Message = "Помилка збереження фотографії!",
+                                Error= ex.Message
+                            });
+                            return res;
+                        }
+                        
+                    }
+                    else
+                    {
+                        res = BadRequest(new
+                        {
+                            Message = "Користувача не існує!"
+                        });
+                        return res;
+                    }
+
+                }else
+                {
+                    res = BadRequest(new
+                    {
+                        Message = "Фотографії немає!"
+                    });
+                    return res;
+                }
+                return res;
+            });
+        }
+        
+        
     }
 }
