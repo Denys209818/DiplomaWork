@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Volonterio.Constants;
 using Volonterio.Data.Entities;
+using Volonterio.Data.Entities.CustomEntities;
 using Volonterio.Models;
 
 namespace Volonterio.Data.Services
