@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Volonterio.Constants;
 using Volonterio.Data.Entities;
+using Volonterio.Data.Entities.CustomEntities;
 using Volonterio.Models;
 
 namespace Volonterio.Data.Services
@@ -141,35 +142,20 @@ namespace Volonterio.Data.Services
                 context.publicationsTagsModels.AddRange(publicationstags);
                 context.SaveChanges();
             }
-
-            if (!context.usersModels.Any())
+            if(!context.messages.Any())
             {
-                var users = new List<UsersModels>()
+                MessageModels messageModels = new MessageModels
                 {
-                    new UsersModels
-                    {
-                        Email = "TestEmail@gmail.com",
-                        FirstName = "Петро",
-                        SecondName = "Бампер",
-                        Image = "petro.jpg",
-                        Phone = "098-123-45-67",
-                        Password = "password",
-                        GroupsId = 1
-                    },
-                    new UsersModels
-                    {
-                        Email = "TestEmail_1@gmail.com",
-                        FirstName = "Дмитро",
-                        SecondName = "Чайник",
-                        Image = "4ainik.jpg",
-                        Phone = "098-003-45-89",
-                        Password = "password1-",
-                        GroupsId = 2
-                    }
+                    Message = "Hello",
+                    UserId = 1,
+                    ChadId = 2,
+                    DateCreated = DateTime.UtcNow,
+                    DateCreatedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
                 };
-                context.usersModels.AddRange(users);
+                context.messages.Add(messageModels);
                 context.SaveChanges();
             }
+            
         }
 
         

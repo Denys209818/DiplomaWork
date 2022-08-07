@@ -19,7 +19,6 @@ namespace Volonterio.Data
         public DbSet<GroupsModels> groupsModels { get; set; }
         public DbSet<UsersModels> usersModels { get; set; }
 
-
         /// <summary>
         /// App entities
         /// </summary>
@@ -30,6 +29,10 @@ namespace Volonterio.Data
         public DbSet<AppPost> Post { get; set; }
         public DbSet<AppUserFriend> UserFriends { get; set; }
         public DbSet<AppFriend> Friends { get; set; }
+
+        public DbSet<MessageModels> messages { get; set; }
+        public DbSet<FriendChatModels> friendChats { get; set; }
+        public DbSet<GroupChatModels> groupChats { get; set; }
 
         public EFContext(DbContextOptions opts) : base(opts)
         {
