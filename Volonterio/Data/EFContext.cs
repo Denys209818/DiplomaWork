@@ -13,6 +13,11 @@ namespace Volonterio.Data
         IdentityRoleClaim<long>, IdentityUserToken<long>>
     {
 
+        public DbSet<PublicationsModels> publicationsModels { get; set; }
+        public DbSet<TagsModels> tagsModels { get; set; }
+        public DbSet<PublicationsTagsModel> publicationsTagsModels { get; set; }
+        public DbSet<GroupsModels> groupsModels { get; set; }
+        public DbSet<UsersModels> usersModels { get; set; }
 
 
         /// <summary>
