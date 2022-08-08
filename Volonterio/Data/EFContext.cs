@@ -12,14 +12,6 @@ namespace Volonterio.Data
     public class EFContext : IdentityDbContext<AppUser, AppRole, long, IdentityUserClaim<long>, AppUserRole, IdentityUserLogin<long>,
         IdentityRoleClaim<long>, IdentityUserToken<long>>
     {
-
-        public DbSet<PublicationsModels> publicationsModels { get; set; }
-        public DbSet<TagsModels> tagsModels { get; set; }
-        public DbSet<PublicationsTagsModel> publicationsTagsModels { get; set; }
-        public DbSet<GroupsModels> groupsModels { get; set; }
-        public DbSet<UsersModels> usersModels { get; set; }
-
-
         /// <summary>
         /// App entities
         /// </summary>
@@ -30,6 +22,8 @@ namespace Volonterio.Data
         public DbSet<AppPost> Post { get; set; }
         public DbSet<AppUserFriend> UserFriends { get; set; }
         public DbSet<AppFriend> Friends { get; set; }
+        public DbSet<AppPostTagEntity> PostTagEntities { get; set; }
+        public DbSet<AppGroupTag> GroupTags { get; set; }
 
         public EFContext(DbContextOptions opts) : base(opts)
         {
@@ -48,6 +42,8 @@ namespace Volonterio.Data
             builder.ApplyConfiguration(new PostTagConfiguration());
             builder.ApplyConfiguration(new UserFriendConfiguration());
             builder.ApplyConfiguration(new FriendConfiguration());
+            builder.ApplyConfiguration(new PostTagEntitiesConfiguration());
+            builder.ApplyConfiguration(new GroupTagConfiguration());
 
 
 
