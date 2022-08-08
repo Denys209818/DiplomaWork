@@ -46,52 +46,116 @@ namespace Volonterio.Data.Services
                 }).Result;
             }
 
+            if(!context.groupsModels.Any())
+            {
+                var group = new List<GroupsModels>()
+                {
+                    new GroupsModels
+                    {
+                        Name = "Group Test",
+                        Description = "Group Test",
+                        Target = "Group Test"
+                    },
+                    new GroupsModels
+                    {
+                        Name = "Group Test_1",
+                        Description = "Group Test_1",
+                        Target = "Group Test_1"
+                    },
+                    new GroupsModels
+                    {
+                        Name = "Group Test_2",
+                        Description = "Group Test_2",
+                        Target = "Group Test_2"
+                    }
+                };
+                context.groupsModels.AddRange(group);
+                context.SaveChanges();
+            }
 
-                    },
-                    new UsersModels
+            if(!context.publicationsModels.Any())
+            {
+                var publications = new List<PublicationsModels>()
+                {
+                    new PublicationsModels
                     {
-                        Email = "TestEmail_1@gmail.com",
-                        FirstName = "Дмитро",
-                        SecondName = "Чайник",
-                        Image = "4ainik.jpg",
-                        Phone = "098-003-45-89",
-                        Password = "password1-",
-                        GroupsId = 2
+                        Name = "PblTest_1",
+                        TegsSearch = "#test1",
+                        GroupsId = 2,
+                        Image = "TestImage1.jpg"
+                    },
+                    new PublicationsModels
+                    {
+                        Name = "PblTest_2",
+                        TegsSearch = "#test2",
+                        GroupsId = 1,
+                        Image = "TestImage2.jpg"
+                    },
+                    new PublicationsModels
+                    {
+                        Name = "PblTest_3",
+                        TegsSearch = "#test3",
+                        GroupsId = 3,
+                        Image = "TestImage3.jpg"
                     }
                 };
-                context.usersModels.AddRange(users);
+                context.publicationsModels.AddRange(publications);
                 context.SaveChanges();
             }
-                    },
-                    new UsersModels
+
+            if(!context.tagsModels.Any())
+            {
+                var tags = new List<TagsModels>()
+                {
+                    new TagsModels
                     {
-                        Email = "TestEmail_1@gmail.com",
-                        FirstName = "Дмитро",
-                        SecondName = "Чайник",
-                        Image = "4ainik.jpg",
-                        Phone = "098-003-45-89",
-                        Password = "password1-",
-                        GroupsId = 2
+                        NameTags = "#test1"
+                    },
+                    new TagsModels
+                    {
+                        NameTags = "#test2"
+                    },
+                    new TagsModels
+                    {
+                        NameTags = "#test3"
                     }
                 };
-                context.usersModels.AddRange(users);
+                context.tagsModels.AddRange(tags);
                 context.SaveChanges();
             }
-                    },
-                    new UsersModels
+
+            if (!context.publicationsTagsModels.Any())
+            {
+                var publicationstags = new List<PublicationsTagsModel>()
+                {
+                    new PublicationsTagsModel
                     {
-                        Email = "TestEmail_1@gmail.com",
-                        FirstName = "Дмитро",
-                        SecondName = "Чайник",
-                        Image = "4ainik.jpg",
-                        Phone = "098-003-45-89",
-                        Password = "password1-",
-                        GroupsId = 2
+                        PublicationsId = 1,
+                        TegsId = 2
+                    },
+                    new PublicationsTagsModel
+                    {
+                        PublicationsId = 2,
+                        TegsId = 1
                     }
                 };
-                context.usersModels.AddRange(users);
+                context.publicationsTagsModels.AddRange(publicationstags);
                 context.SaveChanges();
             }
+            if(!context.messages.Any())
+            {
+                MessageModels messageModels = new MessageModels
+                {
+                    Message = "Hello",
+                    UserId = 1,
+                    ChadId = 2,
+                    DateCreated = DateTime.UtcNow,
+                    DateCreatedUnix = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                };
+                context.messages.Add(messageModels);
+                context.SaveChanges();
+            }
+            
         }
 
         
