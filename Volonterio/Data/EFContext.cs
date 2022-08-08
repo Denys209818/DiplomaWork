@@ -14,6 +14,7 @@ namespace Volonterio.Data
     {
 
 
+
         /// <summary>
         /// App entities
         /// </summary>
@@ -26,10 +27,6 @@ namespace Volonterio.Data
         public DbSet<AppFriend> Friends { get; set; }
         public DbSet<AppPostTagEntity> PostTagEntities { get; set; }
         public DbSet<AppGroupTag> GroupTags { get; set; }
-
-        public DbSet<MessageModels> messages { get; set; }
-        public DbSet<FriendChatModels> friendChats { get; set; }
-        public DbSet<GroupChatModels> groupChats { get; set; }
 
         public DbSet<MessageModels> messages { get; set; }
         public DbSet<FriendChatModels> friendChats { get; set; }
