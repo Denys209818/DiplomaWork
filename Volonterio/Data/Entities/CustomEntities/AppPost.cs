@@ -6,7 +6,7 @@
         public string Title { get; set; }
         public string Text { get; set; }
         public virtual ICollection<AppPostImage> Images { get; set; }
-        public virtual ICollection<AppPostTag> Tags { get; set; }
+        public virtual ICollection<AppPostTagEntity> PostTagEntities { get; set; }
 
 
         public int GroupId { get; set; }

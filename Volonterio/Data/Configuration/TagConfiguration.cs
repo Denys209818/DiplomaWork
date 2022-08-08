@@ -12,11 +12,6 @@ namespace Volonterio.Data.Configuration
 
             builder.ToTable("tblAppTag");
 
-            builder.HasOne(x => x.Group)
-                .WithMany(x => x.Tags)
-                .HasForeignKey(x => x.GroupId)
-                .IsRequired();
-
             builder.Property(x => x.Tag)
                 .HasMaxLength(255)
                 .IsRequired();

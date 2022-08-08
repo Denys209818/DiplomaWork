@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Volonterio.Data.Entities;
+using Volonterio.Data.Entities.CustomEntities;
 using Volonterio.Models;
 
 namespace Volonterio.Mappers
@@ -17,7 +18,25 @@ namespace Volonterio.Mappers
                 .ForMember(x => x.Image, y => y.MapFrom(z => "default.jpg"));
 
             //CreateMap<EditUserModel, AppUser>()
-            //    .ForMember(x  => x.)
+            //    .ForMember(x  => x.)s
+            CreateMap<CreateGroup, AppGroup>()
+                .ForMember(x => x.Title, x => x.MapFrom(y => y.Title))
+                .ForMember(x => x.Meta, x => x.MapFrom(y => y.Meta))
+                .ForMember(x => x.Description, x => x.MapFrom(y => y.Description))
+                .ForMember(x => x.User, x => x.Ignore())
+                .ForMember(x => x.UserId, x => x.Ignore())
+                .ForMember(x => x.Id, x => x.Ignore())
+                .ForMember(x => x.Posts, x => x.Ignore())
+                ;
+
+            CreateMap<AppGroup, GroupReturn>()
+                .ForMember(x => x.Title, x => x.MapFrom(y => y.Title))
+                .ForMember(x => x.Id, x => x.MapFrom(y => y.Id))
+                .ForMember(x => x.Meta, x => x.MapFrom(y => y.Meta))
+                .ForMember(x => x.Description, x => x.MapFrom(y => y.Description))
+                .ForMember(x => x.Image, x => x.MapFrom(y => y.Image))
+                .ForMember(x => x.Tags, x => x.Ignore())
+                ;              
         }
     }
 }

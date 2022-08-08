@@ -4,7 +4,6 @@
     {
         public int Id { get; set; }
         public string Tag { get; set; }
-        public int GroupId { get; set; }
-        public virtual AppGroup Group { get; set; }
+        public virtual ICollection<AppGroupTag> AppGroupTags { get; set; }
     }
 }
