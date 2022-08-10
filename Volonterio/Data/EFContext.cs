@@ -19,6 +19,7 @@ namespace Volonterio.Data
         public DbSet<GroupsModels> groupsModels { get; set; }
         public DbSet<UsersModels> usersModels { get; set; }
 
+
         /// <summary>
         /// App entities
         /// </summary>
@@ -29,6 +30,8 @@ namespace Volonterio.Data
         public DbSet<AppPost> Post { get; set; }
         public DbSet<AppUserFriend> UserFriends { get; set; }
         public DbSet<AppFriend> Friends { get; set; }
+        public DbSet<AppPostTagEntity> PostTagEntities { get; set; }
+        public DbSet<AppGroupTag> GroupTags { get; set; }
 
         public DbSet<MessageModels> messages { get; set; }
         public DbSet<FriendChatModels> friendChats { get; set; }
@@ -51,6 +54,8 @@ namespace Volonterio.Data
             builder.ApplyConfiguration(new PostTagConfiguration());
             builder.ApplyConfiguration(new UserFriendConfiguration());
             builder.ApplyConfiguration(new FriendConfiguration());
+            builder.ApplyConfiguration(new PostTagEntitiesConfiguration());
+            builder.ApplyConfiguration(new GroupTagConfiguration());
 
 
 

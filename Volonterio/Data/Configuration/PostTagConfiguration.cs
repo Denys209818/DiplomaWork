@@ -12,11 +12,6 @@ namespace Volonterio.Data.Configuration
 
             builder.HasKey(x => x.Id);
 
-            builder.HasOne(x => x.Post)
-                .WithMany(x => x.Tags)
-                .HasForeignKey(x => x.PostId)
-                .IsRequired();
-
             builder.Property(x => x.Tag)
                 .HasMaxLength(255)
                 .IsRequired();

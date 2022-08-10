@@ -58,12 +58,14 @@ builder.Services.AddAuthentication((AuthenticationOptions opts) => {
 
 builder.Services.AddScoped<IJwtBearerService, JwtBearerService>();
 builder.Services.AddAutoMapper(typeof(UserMapper));
+builder.Services.AddAutoMapper(typeof(PostMapper));
+
+
 
 builder.Services.AddCors();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     
