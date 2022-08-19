@@ -28,8 +28,12 @@ namespace Volonterio.Services
             claims.Add(new Claim("email", user.UserName));
             claims.Add(new Claim("firstName", user.FirstName));
             claims.Add(new Claim("secondName", user.SecondName));
+            claims.Add(new Claim("image", user.Image));
+            claims.Add(new Claim("id", user.Id.ToString()));
+            claims.Add(new Claim("phone", user.PhoneNumber.ToString()));
 
-            foreach (var role in _userManager.GetRolesAsync(user).Result)
+            var roles = _userManager.GetRolesAsync(user).Result; 
+            foreach (var role in roles)
             {
                 claims.Add(new Claim("roles", role));
             }

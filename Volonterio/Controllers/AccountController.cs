@@ -56,9 +56,10 @@ namespace Volonterio.Controllers
                             });
                             return res;
                         }
-                    }else
+                    }
+                    else
                     {
-                        
+
                         res = BadRequest(new
                         {
                             Errors = r.Errors.Select(x => "Code: " + x.Code + "; Description: " + x.Description).ToList()
@@ -145,21 +146,18 @@ namespace Volonterio.Controllers
 
                     res = BadRequest(new
                     {
-                        Errors = new
-                        {
-                            Message = "Користувача не існує!"
-                        }
+                        Errors = new string[] { "Користувача не існує!" }
                     });
                     return res;
                 }
-                else 
+                else
                 {
                     user.FirstName = edit.FirstName;
                     user.SecondName = edit.SecondName;
                     user.PhoneNumber = edit.PhoneNumber;
 
                     var upd = _userManager.UpdateAsync(user).Result;
-                    if(!upd.Succeeded)
+                    if (!upd.Succeeded)
                     {
                         res = BadRequest(new
                         {
@@ -168,60 +166,65 @@ namespace Volonterio.Controllers
                         return res;
                     }
 
-                    if(!edit.OldPassword.ToLower().Equals(edit.Password.ToLower()))
+                    if (!string.IsNullOrEmpty(edit.OldPassword) &&
+                    !string.IsNullOrEmpty(edit.Password) &&
+                    !string.IsNullOrEmpty(edit.ConfirmPassword)
+                    )
                     {
-                        if(edit.Password.ToLower().Equals(edit.ConfirmPassword.ToLower()))
-                        {
 
-                            var changed = _userManager.ChangePasswordAsync(user, edit.OldPassword, edit.Password).Result;   
-                            if(!changed.Succeeded)
+                        if (!edit.OldPassword.ToLower().Equals(edit.Password.ToLower()))
+                        {
+                            if (edit.Password.ToLower().Equals(edit.ConfirmPassword.ToLower()))
+                            {
+
+                                var changed = _userManager.ChangePasswordAsync(user, edit.OldPassword, edit.Password).Result;
+                                if (!changed.Succeeded)
+                                {
+                                    res = BadRequest(new
+                                    {
+                                        Errors = changed.Errors.Select(x => "Code: " + x.Code + "; Description: " + x.Description)
+                                    });
+                                    return res;
+                                }
+                            }
+                            else
                             {
                                 res = BadRequest(new
                                 {
-                                    Errors = changed.Errors.Select(x => "Code: " + x.Code + "; Description: " + x.Description)
+                                    Errors = new string[] { "Паролі не співпадають!" }
+
                                 });
                                 return res;
                             }
-                        }else
+                        }
+                        else
                         {
                             res = BadRequest(new
                             {
-                                Errors = new
-                                {
-                                    Message = "Паролі не співпадають!"
-                                }
+                                Errors = new string[] { "Паролі однакові!" }
                             });
                             return res;
                         }
-                    }else
-                    {
-                        res = BadRequest(new
-                        {
-                            Errors = new
-                            {
-                                Message = "Паролі співпадають!"
-                            }
-                        });
-                        return res;
                     }
-                    
+
                 }
-                return res;
+
+                return Ok(_jwtBearer.GenerateToken(user));
             });
         }
 
         [HttpPost]
         [Route("remove")]
-        public async Task<IActionResult> RemoveUser([FromBody] RemoveUserModel remove) 
+        public async Task<IActionResult> RemoveUser([FromBody] RemoveUserModel remove)
         {
             IActionResult res = Ok("Користувача видалено!");
             return await Task.Run(() =>
             {
                 var user = _userManager.FindByEmailAsync(remove.Email).Result;
-                if(user != null)
+                if (user != null)
                 {
                     var del = _userManager.DeleteAsync(user).Result;
-                    if(!del.Succeeded)
+                    if (!del.Succeeded)
                     {
                         res = BadRequest(new
                         {
@@ -230,7 +233,8 @@ namespace Volonterio.Controllers
 
                         return res;
                     }
-                }else
+                }
+                else
                 {
                     res = BadRequest(new
                     {
@@ -250,12 +254,35 @@ namespace Volonterio.Controllers
             IActionResult res = Ok("Фотографію змінено!");
             return await Task.Run(() =>
             {
-                if(changeImage.ImageBase64 != null)
-                {
-                    var user = _userManager.FindByEmailAsync(changeImage.Email).Result;
+                var user = _userManager.FindByEmailAsync(changeImage.Email).Result;
 
-                    if(user != null)
+                if (user != null)
+                {
+                    if (changeImage.ImageBase64 != null)
                     {
+                        if(changeImage.ImageBase64.Equals("default.jpg"))
+                        {
+                            string oldPath = Path.Combine(Directory.GetCurrentDirectory(), "Images", user.Image);
+                            if (System.IO.File.Exists(oldPath) && !oldPath.Contains("default.jpg"))
+                            {
+                                System.IO.File.Delete(oldPath);
+                            }
+                            user.Image = "default.jpg";
+                            var upd = _userManager.UpdateAsync(user).Result;
+                            if(upd.Succeeded)
+                            {
+
+                                return Ok(_jwtBearer.GenerateToken(user));
+                            }else
+                            {
+                                res = BadRequest(new
+                                {
+                                    Errors = upd.Errors.Select(x => "Code: " + x.Code + "; Description: " + x.Description)
+                                });
+                                return res;
+                            }
+
+                        }
                         string fileName = Path.GetRandomFileName() + ".jpg";
                         string newFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Images");
                         string filePath = Path.Combine(newFilePath, fileName);
@@ -263,17 +290,20 @@ namespace Volonterio.Controllers
                         try
                         {
                             string fileNameOld = Path.Combine(Directory.GetCurrentDirectory(), "Images", user.Image);
-                            if(System.IO.File.Exists(fileNameOld))
+
+                            if (System.IO.File.Exists(fileNameOld) && !fileNameOld.Contains("default.jpg"))
                             {
                                 System.IO.File.Delete(fileNameOld);
                             }
 
-                            Bitmap bmp = ImageWorker.ConvertToBitmap(changeImage.ImageBase64);
+                            var arr = changeImage.ImageBase64.Split(",");
+                            var code = arr[1];
+                            Bitmap bmp = ImageWorker.ConvertToBitmap(code);
                             bmp.Save(filePath);
 
                             user.Image = fileName;
                             var upd = _userManager.UpdateAsync(user).Result;
-                            if(!upd.Succeeded)
+                            if (!upd.Succeeded)
                             {
                                 res = BadRequest(new
                                 {
@@ -286,34 +316,34 @@ namespace Volonterio.Controllers
                         {
                             res = BadRequest(new
                             {
-                                Message = "Помилка збереження фотографії!",
-                                Error= ex.Message
+                                Errors = new string[] { "Помилка збереження фотографії!", ex.Message }
                             });
                             return res;
                         }
-                        
+
                     }
                     else
                     {
                         res = BadRequest(new
                         {
-                            Message = "Користувача не існує!"
+                            Errors =new string[] { "Фотографії немає!" }
                         });
                         return res;
                     }
 
-                }else
+                }
+                else
                 {
                     res = BadRequest(new
                     {
-                        Message = "Фотографії немає!"
+                        Errors = new string[] { "Користувача не існує!" }
                     });
                     return res;
                 }
-                return res;
+                return Ok(_jwtBearer.GenerateToken(user));
             });
         }
-        
-        
+
+
     }
 }
