@@ -35,14 +35,21 @@ namespace Volonterio.Data.Services
 
             if (!userManager.Users.Any()) 
             {
-                var res = userManager.CreateAsync(new AppUser { 
+                var user = new AppUser
+                {
                     UserName = "admin@gmail.com",
                     Email = "admin@gmail.com",
                     PhoneNumber = "38000000000",
                     FirstName = "Denys",
                     SecondName = "Kravchuk",
                     Image = "1.jpg"
-                }).Result;
+                };
+                var res = userManager.CreateAsync(user,"qwerty").Result;
+
+                if(res.Succeeded)
+                {
+                     var result = userManager.AddToRoleAsync(user, Roles.ADMIN).Result;
+                }
             }
 
 

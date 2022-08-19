@@ -1,11 +1,14 @@
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System.Text;
 using Volonterio.Data;
 using Volonterio.Data.Entities;
@@ -60,11 +63,22 @@ builder.Services.AddScoped<IJwtBearerService, JwtBearerService>();
 builder.Services.AddAutoMapper(typeof(UserMapper));
 builder.Services.AddAutoMapper(typeof(PostMapper));
 
+builder.Services.AddControllers().AddNewtonsoftJson(opts => {
+
+    opts.SerializerSettings.DefaultValueHandling = DefaultValueHandling.Include;
+    opts.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+    opts.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+});
+
 
 
 builder.Services.AddCors();
 
 var app = builder.Build();
+app.UseCors((CorsPolicyBuilder builder) => {
+    builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
+});
+
 
 if (app.Environment.IsDevelopment())
 {
