@@ -47,7 +47,7 @@ namespace Volonterio.Controllers
                 var group = _mapper.Map<AppGroup>(createGroup);
 
 
-                if(!string.IsNullOrEmpty(createGroup.Image))
+                if(!string.IsNullOrEmpty(createGroup.Image) && createGroup.Image != "default.jpg")
                 {
                     string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Images", "Group");
                     string fileName = Path.GetRandomFileName() + ".jpg";
@@ -199,7 +199,62 @@ namespace Volonterio.Controllers
             });
         }
 
+        [HttpPost]
+        [Route("getbyid")]
+        public async Task<IActionResult> GetGroupById([FromBody] GetById getModel)
+        {
+            return await Task.Run(() =>
+            {
+                IActionResult res = null;
+                try
+                {
 
+                    var list = _context.Groups.Where(x => x.UserId == getModel.Id)
+                    .Select(x => _mapper.Map<GetByIdResult>(x)).ToList();
+                    res = Ok(list);
+                    return res;
+
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex);
+                }
+
+            });
+        }
+
+        [HttpPost]
+        [Route("getbyname")]
+        public async Task<IActionResult> GetGroupByName([FromBody] GetByName getModel)
+        {
+            return await Task.Run(() =>
+            {
+                IActionResult res = null;
+                try
+                {
+
+                    var list = _context.Groups.Where(x => x.Title.ToLower() == 
+                    getModel.Name.ToLower())
+                    .Select(x => _mapper.Map<GetByIdResult>(x)).ToList();
+                    var group = list.FirstOrDefault();
+                    if(group != null)
+                    {
+                        res = Ok(group.Id);
+                        return res;
+                    }else
+                    {
+                        res = BadRequest("Не існує групи!");
+                        return res;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex);
+                }
+
+            });
+        }
 
 
 

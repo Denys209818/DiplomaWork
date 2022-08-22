@@ -39,4 +39,19 @@
     {
         public string param { get; set; }
     }
+
+    public class GetById
+    {
+        public int Id { get; set; }
+    }
+    public class GetByName
+    {
+        public string Name { get; set; }
+    }
+
+    public class GetByIdResult
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+    }
 }
