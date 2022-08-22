@@ -250,9 +250,13 @@ namespace Volonterio.Controllers
                 string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Images", "Post", image.Image);
                 if (System.IO.File.Exists(filePath))
                 {
-                    _context.PostImages.Remove(_context.PostImages.Where(x => x.Image.ToLower()
-                    == image.Image.ToLower()).FirstOrDefault());
-                    _context.SaveChanges();
+                    var item = _context.PostImages.Where(x => x.Image.ToLower()
+                    == image.Image.ToLower()).FirstOrDefault();
+                    if(item != null)
+                    {
+                        _context.PostImages.Remove(item);
+                        _context.SaveChanges();
+                    }
                     System.IO.File.Delete(filePath);
                 }
                 else
