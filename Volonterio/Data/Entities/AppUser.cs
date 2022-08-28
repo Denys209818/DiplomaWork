@@ -14,5 +14,6 @@ namespace Volonterio.Data.Entities
         public virtual ICollection<AppUserRole> UserRoles { get; set; }
 
         public virtual ICollection<AppFriend> Friends { get; set; }
+        public virtual ICollection<AppUserGroup> UserGroups { get; set; }
     }
 }

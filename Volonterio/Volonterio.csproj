@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Images\Group\" />
     <Folder Include="Images\Post\" />
   </ItemGroup>
 

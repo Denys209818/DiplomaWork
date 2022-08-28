@@ -39,7 +39,16 @@ namespace Volonterio.Mappers
                 ;
             CreateMap<AppGroup, GetByIdResult>()
                 .ForMember(x => x.Id, y => y.MapFrom(x => x.Id))
-                .ForMember(x => x.Title, y => y.MapFrom(x => x.Title));
+                .ForMember(x => x.Title, y => y.MapFrom(x => x.Title))
+                .ForMember(x => x.Description, y => y.MapFrom(x => x.Description))
+                .ForMember(x => x.Image, y => y.MapFrom(z => z.Image));
+
+            CreateMap<AppPost, GetPostByGroupId>()
+                .ForMember(x => x.Id, y => y.MapFrom(x => x.Id))
+                .ForMember(x=> x.Title, y => y.MapFrom(x => x.Title))
+                .ForMember(x=> x.Description, y => y.MapFrom(x => x.Text))
+                .ForMember(x=> x.Images, y => y.MapFrom(x => x.Images.Select(x => x.Image)))
+                ;
         }
     }
 }

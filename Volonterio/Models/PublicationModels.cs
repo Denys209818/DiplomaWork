@@ -38,4 +38,12 @@
     {
         public string Image { get; set; }
     }
+
+    public class GetPostByGroupId
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public List<string> Images { get; set; }
+    }
 }

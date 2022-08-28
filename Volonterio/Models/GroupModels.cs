@@ -37,7 +37,15 @@
 
     public class SearchGroup
     {
-        public string param { get; set; }
+        public string Param { get; set; }
+        public int Page { get; set; }
+        public int UserId { get; set; }
+    }
+
+    public class SubscribeModal
+    {
+        public int GroupId { get; set; }
+        public int UserId { get; set; }
     }
 
     public class GetById
@@ -53,5 +61,7 @@
     {
         public int Id { get; set; }
         public string Title { get; set; }
+        public string Description { get; set; }
+        public string Image { get; set; }
     }
 }

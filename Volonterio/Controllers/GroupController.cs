@@ -176,11 +176,36 @@ namespace Volonterio.Controllers
         {
             return await Task.Run(() =>
             {
+                int count = 5;
                 var searchData = _context.Groups.Include(x => x.AppGroupTags)
-                .Where(x => x.Title.Contains(search.param))
+                .Where(x => x.Title.ToLower().Contains(search.Param.ToLower()))
                 .Select(x => _mapper.Map<GroupReturn>(x)).ToList();
 
-                foreach (var search in searchData)
+                List<GroupReturn> returned = new List<GroupReturn>();
+
+
+                returned.AddRange(searchData);
+
+
+                var searchForTag = _context.Tags.Include(x => x.AppGroupTags).Where(x => x.Tag.Contains( search.Param))
+                .Select(x => x.AppGroupTags.Select(x => _context.Groups.Where(y => y.Id == x.GroupId)
+                .Select(z => _mapper.Map<GroupReturn>(z)).ToList())).ToList();
+
+                foreach (var item in searchForTag)
+                {
+                    foreach (var listGroup in item)
+                    {
+                        foreach (var listItem in listGroup)
+                        {
+                            if(!returned.Where(x => x.Id == listItem.Id).Any())
+                            {
+                                returned.Add(listItem);
+                            }
+                        }
+                    }
+                }
+
+                foreach (var search in returned)
                 {
 
                     var tags = new List<string>();
@@ -194,8 +219,12 @@ namespace Volonterio.Controllers
                     string tag = string.Join("#",tags);
                     search.Tags = tag;
                 }
-                
-                return Ok(searchData);
+
+                var result = returned.Where(x => !_context.UserGroups.Where(y => y.GroupId == x.Id &&
+                y.UserId == search.UserId).Any() && !_context.Groups.Where(y  => y.Id == x.Id && 
+                y.UserId == search.UserId).Any()).Select(x => x);
+
+                return Ok(result.Skip(count*search.Page).Take(count));
             });
         }
 
@@ -209,9 +238,14 @@ namespace Volonterio.Controllers
                 try
                 {
 
-                    var list = _context.Groups.Where(x => x.UserId == getModel.Id)
-                    .Select(x => _mapper.Map<GetByIdResult>(x)).ToList();
-                    res = Ok(list);
+                    //var list = _context.Groups.Where(x => x.UserId == getModel.Id)
+                    //.Select(x => _mapper.Map<GetByIdResult>(x)).ToList();
+
+
+                    var groups = _context.Groups.Where(x => _context.UserGroups.Where(y => (y.GroupId == x.Id &&
+                    y.UserId == getModel.Id) || x.UserId == getModel.Id).Any()).Select(x => x).ToList();
+                    //|| x.UserId == getModel.Id).Any()
+                    res = Ok(groups);
                     return res;
 
                 }
@@ -256,6 +290,58 @@ namespace Volonterio.Controllers
             });
         }
 
+        [HttpPost]
+        [Route("getgroupsbyid")]
+        public async Task<IActionResult> GetGroupsByUserId([FromBody] int id)
+        {
+            return await Task.Run(() =>
+            {
+                var groups = _context.Groups.Where(x => x.UserId == id)
+                .Select(x => _mapper.Map<GetByIdResult>(x)).ToList();
+
+                
+                return Ok(groups);
+            });
+        }
+
+        [HttpPost]
+        [Route("getgroup")]
+        public async Task<IActionResult> GetGroup([FromBody] int id)
+        {
+            return await Task.Run(() =>
+            {
+                return Ok(_context.Groups.Where(x => x.Id == id).Select(x => new
+                {
+                    Id = x.Id,
+                    Title= x.Title,
+                    Meta =x.Meta,
+                    Descrption = x.Description,
+                    Image= x.Image
+
+                }).FirstOrDefault());
+            });
+        }
+
+        [HttpPost]
+        [Route("subscribe")]
+        public async Task<IActionResult> Subscribe([FromBody] SubscribeModal subscribe)
+        {
+            return await Task.Run(() =>
+            {
+                if(!_context.UserGroups.Where(x => x.GroupId == subscribe.GroupId && 
+                x.UserId == subscribe.UserId).Any())
+                {
+                    _context.UserGroups.Add(new AppUserGroup
+                    {
+                        GroupId = subscribe.GroupId,   
+                        UserId = subscribe.UserId
+                    });
+
+                    _context.SaveChanges();
+                }
+                return Ok();
+            });
+        }
 
 
         //Custom Methods
