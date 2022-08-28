@@ -24,6 +24,7 @@ namespace Volonterio.Data
         public DbSet<AppFriend> Friends { get; set; }
         public DbSet<AppPostTagEntity> PostTagEntities { get; set; }
         public DbSet<AppGroupTag> GroupTags { get; set; }
+        public DbSet<AppUserGroup> UserGroups { get; set; }
 
         public EFContext(DbContextOptions opts) : base(opts)
         {
@@ -44,6 +45,7 @@ namespace Volonterio.Data
             builder.ApplyConfiguration(new FriendConfiguration());
             builder.ApplyConfiguration(new PostTagEntitiesConfiguration());
             builder.ApplyConfiguration(new GroupTagConfiguration());
+            builder.ApplyConfiguration(new UserGroupConfiguration());
 
 
 

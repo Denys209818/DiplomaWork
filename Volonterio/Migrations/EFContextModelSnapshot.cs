@@ -425,6 +425,21 @@ namespace Volonterio.Migrations
                     b.ToTable("tblAppUserFriend", (string)null);
                 });
 
+            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppUserGroup", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("GroupId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("tblAppUserGroup", (string)null);
+                });
+
             modelBuilder.Entity("Volonterio.Models.GroupsModels", b =>
                 {
                     b.Property<int>("Id")
@@ -701,6 +716,25 @@ namespace Volonterio.Migrations
                     b.Navigation("PostTag");
                 });
 
+            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppUserGroup", b =>
+                {
+                    b.HasOne("Volonterio.Data.Entities.CustomEntities.AppGroup", "Group")
+                        .WithMany("UserGroups")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Volonterio.Data.Entities.AppUser", "User")
+                        .WithMany("UserGroups")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Volonterio.Models.PublicationsModels", b =>
                 {
                     b.HasOne("Volonterio.Models.GroupsModels", "idgroups")
@@ -753,6 +787,8 @@ namespace Volonterio.Migrations
 
                     b.Navigation("Groups");
 
+                    b.Navigation("UserGroups");
+
                     b.Navigation("UserRoles");
                 });
 
@@ -761,6 +797,8 @@ namespace Volonterio.Migrations
                     b.Navigation("AppGroupTags");
 
                     b.Navigation("Posts");
+
+                    b.Navigation("UserGroups");
                 });
 
             modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppPost", b =>

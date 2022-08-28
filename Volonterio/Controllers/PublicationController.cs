@@ -273,6 +273,17 @@ namespace Volonterio.Controllers
         }
 
 
+        [HttpPost]
+        [Route("getpostbygroupid")]
+        public async Task<IActionResult> GetPostByGroupId([FromBody] int id)
+        {
+            return await Task.Run(() =>
+            {
+                var posts = _context.Post.Include(x => x.Images).Where(x => x.GroupId == id)
+                .Select(x => _mapper.Map<GetPostByGroupId>(x)).ToList();
+                return Ok(posts);
+            });
+        }
 
         //Custom Methods
         private void SetTags(string Tags, AppPost post)
