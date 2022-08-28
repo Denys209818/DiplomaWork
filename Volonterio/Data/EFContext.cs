@@ -12,6 +12,14 @@ namespace Volonterio.Data
     public class EFContext : IdentityDbContext<AppUser, AppRole, long, IdentityUserClaim<long>, AppUserRole, IdentityUserLogin<long>,
         IdentityRoleClaim<long>, IdentityUserToken<long>>
     {
+
+        public DbSet<PublicationsModels> publicationsModels { get; set; }
+        public DbSet<TagsModels> tagsModels { get; set; }
+        public DbSet<PublicationsTagsModel> publicationsTagsModels { get; set; }
+        public DbSet<GroupsModels> groupsModels { get; set; }
+        public DbSet<UsersModels> usersModels { get; set; }
+
+
         /// <summary>
         /// App entities
         /// </summary>
@@ -25,6 +33,10 @@ namespace Volonterio.Data
         public DbSet<AppPostTagEntity> PostTagEntities { get; set; }
         public DbSet<AppGroupTag> GroupTags { get; set; }
         public DbSet<AppUserGroup> UserGroups { get; set; }
+
+        public DbSet<MessageModels> messages { get; set; }
+        public DbSet<FriendChatModels> friendChats { get; set; }
+        public DbSet<GroupChatModels> groupChats { get; set; }
 
         public EFContext(DbContextOptions opts) : base(opts)
         {

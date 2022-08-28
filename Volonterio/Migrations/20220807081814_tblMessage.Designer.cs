@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Volonterio.Data;
@@ -11,9 +12,10 @@ using Volonterio.Data;
 namespace Volonterio.Migrations
 {
     [DbContext(typeof(EFContext))]
-    partial class EFContextModelSnapshot : ModelSnapshot
+    [Migration("20220807081814_tblMessage")]
+    partial class tblMessage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -295,21 +297,6 @@ namespace Volonterio.Migrations
                     b.ToTable("tblAppGroup", (string)null);
                 });
 
-            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppGroupTag", b =>
-                {
-                    b.Property<int>("GroupId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TagId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("GroupId", "TagId");
-
-                    b.HasIndex("TagId");
-
-                    b.ToTable("tblAppGroupTag", (string)null);
-                });
-
             modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppPost", b =>
                 {
                     b.Property<int>("Id")
@@ -369,6 +356,9 @@ namespace Volonterio.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("PostId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Tag")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -376,22 +366,9 @@ namespace Volonterio.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PostId");
+
                     b.ToTable("tblAppPostTag", (string)null);
-                });
-
-            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppPostTagEntity", b =>
-                {
-                    b.Property<int>("PostId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PostTagId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("PostId", "PostTagId");
-
-                    b.HasIndex("PostTagId");
-
-                    b.ToTable("tblAppPostTagEntities", (string)null);
                 });
 
             modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppTag", b =>
@@ -402,12 +379,17 @@ namespace Volonterio.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Tag")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
 
                     b.ToTable("tblAppTag", (string)null);
                 });
@@ -424,20 +406,6 @@ namespace Volonterio.Migrations
 
                     b.ToTable("tblAppUserFriend", (string)null);
                 });
-
-            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppUserGroup", b =>
-                {
-                    b.Property<int>("GroupId")
-                        .HasColumnType("integer");
-
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("GroupId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("tblAppUserGroup", (string)null);
 
             modelBuilder.Entity("Volonterio.Models.FriendChatModels", b =>
                 {
@@ -720,25 +688,6 @@ namespace Volonterio.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppGroupTag", b =>
-                {
-                    b.HasOne("Volonterio.Data.Entities.CustomEntities.AppGroup", "Group")
-                        .WithMany("AppGroupTags")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Volonterio.Data.Entities.CustomEntities.AppTag", "Tag")
-                        .WithMany("AppGroupTags")
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Group");
-
-                    b.Navigation("Tag");
-                });
-
             modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppPost", b =>
                 {
                     b.HasOne("Volonterio.Data.Entities.CustomEntities.AppGroup", "Group")
@@ -761,42 +710,26 @@ namespace Volonterio.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppPostTagEntity", b =>
+            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppPostTag", b =>
                 {
                     b.HasOne("Volonterio.Data.Entities.CustomEntities.AppPost", "Post")
-                        .WithMany("PostTagEntities")
+                        .WithMany("Tags")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Volonterio.Data.Entities.CustomEntities.AppPostTag", "PostTag")
-                        .WithMany("PostTagEntities")
-                        .HasForeignKey("PostTagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Post");
-
-                    b.Navigation("PostTag");
                 });
 
-            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppUserGroup", b =>
+            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppTag", b =>
                 {
                     b.HasOne("Volonterio.Data.Entities.CustomEntities.AppGroup", "Group")
-                        .WithMany("UserGroups")
+                        .WithMany("Tags")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Volonterio.Data.Entities.AppUser", "User")
-                        .WithMany("UserGroups")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Group");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Volonterio.Models.PublicationsModels", b =>
@@ -851,35 +784,21 @@ namespace Volonterio.Migrations
 
                     b.Navigation("Groups");
 
-                    b.Navigation("UserGroups");
-
                     b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppGroup", b =>
                 {
-                    b.Navigation("AppGroupTags");
-
                     b.Navigation("Posts");
 
-                    b.Navigation("UserGroups");
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppPost", b =>
                 {
                     b.Navigation("Images");
 
-                    b.Navigation("PostTagEntities");
-                });
-
-            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppPostTag", b =>
-                {
-                    b.Navigation("PostTagEntities");
-                });
-
-            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppTag", b =>
-                {
-                    b.Navigation("AppGroupTags");
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppUserFriend", b =>
