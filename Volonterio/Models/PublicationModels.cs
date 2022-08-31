@@ -30,7 +30,7 @@
         public string Title { get; set; }
         public string Text { get; set; }
         public string Tags { get; set; }
-        public List<PublicationImageModel> Images { get; set; }
+        //public List<PublicationImageModel> Images { get; set; }
         public int PublicationId { get; set; }
     }
 
@@ -45,5 +45,22 @@
         public string Title { get; set; }
         public string Description { get; set; }
         public List<string> Images { get; set; }
+    }
+
+    public class IPublicationData
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public List<string> Images { get; set; }
+        public string Tags { get; set; }
+        public int UserId { get; set; }
+        public int GroupId { get; set; }
+    }
+
+    public class IEditDynamicImage
+    {
+        public string Image { get; set; }
+        public int PostId { get; set; }
     }
 }

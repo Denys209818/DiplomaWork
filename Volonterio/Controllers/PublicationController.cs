@@ -86,7 +86,7 @@ namespace Volonterio.Controllers
             });
         }
 
-        [HttpDelete]
+        [HttpPost]
         [Route("delete")]
         public async Task<IActionResult> DeletePublication([FromBody] DeletePublicationModel delete)
         {
@@ -154,7 +154,6 @@ namespace Volonterio.Controllers
 
 
 
-
                 List<string> tags = edit.Tags.Split("#").Where(x => !string.IsNullOrEmpty(x)).ToList();
                 if (tags != null && tags.Count() > 0)
                 {
@@ -212,28 +211,37 @@ namespace Volonterio.Controllers
                     }
                 }
 
-                if (edit.Images != null && edit.Images.Count() > 0)
-                {
-                    foreach (var image in edit.Images)
-                    {
-                        string fullPath = Path.Combine(Directory.GetCurrentDirectory(), "Images", "Post", image.Image);
-                        var postImg = _context.PostImages.Where(x => x.PostId == publication.Id
-                        && x.Image.ToLower() == image.Image.ToLower()).FirstOrDefault();
-                        if (postImg == null)
-                        {
+                //
+                //if (edit.Images != null && edit.Images.Count() > 0)
+                //{
+                //    foreach (var image in edit.Images)
+                //    {
+                //        string fullPath = Path.Combine(
+                //            Directory.GetCurrentDirectory(), "Images", "Post", image.Image);
+                //        var postImg = _context.PostImages.Where(x => x.PostId == publication.Id
+                //        && x.Image.ToLower() == image.Image.ToLower()).FirstOrDefault();
+                //        if (postImg == null)
+                //        {
 
-                            AppPostImage img = new AppPostImage
-                            {
-                                Image = image.Image,
-                                Post = publication
-                            };
+                //            AppPostImage img = new AppPostImage
+                //            {
+                //                Image = image.Image,
+                //                Post = publication
+                //            };
 
-                            _context.PostImages.Add(img);
-                            _context.SaveChanges();
+                //            _context.PostImages.Add(img);
+                //            _context.SaveChanges();
 
-                        }
-                    }
-                }
+                //        }
+                //        else
+                //        {
+                //            if (!System.IO.File.Exists(fullPath))
+                //            {
+                //                _context.PostImages.Remove(postImg);
+                //            }
+                //        }
+                //    }
+                //}
 
                 _context.SaveChanges();
                 return res;
@@ -281,7 +289,89 @@ namespace Volonterio.Controllers
             {
                 var posts = _context.Post.Include(x => x.Images).Where(x => x.GroupId == id)
                 .Select(x => _mapper.Map<GetPostByGroupId>(x)).ToList();
+                if (posts != null)
+                {
+                    foreach (GetPostByGroupId post in posts)
+                    {
+                        foreach (var postImage in post.Images)
+                        {
+                            if (!string.IsNullOrEmpty(postImage))
+                            {
+                                string imgs = postImage;
+                                  #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+                                AppPostImage img = _context.PostImages
+                                .Where(x => x.Image.ToLower() == imgs.ToLower())
+                                .FirstOrDefault();
+                                   #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+                                if (img != null)
+                                {
+                                    string fullPath = Path.Combine(Directory.GetCurrentDirectory(), "Images", "Post", imgs);
+                                    if(!System.IO.File.Exists(fullPath))
+                                    {
+                                        _context.PostImages.Remove(img);
+                                        _context.SaveChanges();
+
+                                        post.Images.Remove(imgs);
+                                    }
+                                }
+
+
+                            }
+                        }
+                    }
+                }
+
                 return Ok(posts);
+            });
+        }
+
+        [HttpPost]
+        [Route("getpostdatabyid")]
+        public async Task<IActionResult> GetPostDataById([FromBody] int id)
+        {
+            return await Task.Run(() =>
+            {
+                IActionResult res = Ok();
+                AppPost? post = _context.Post.Where(x => x.Id == id).Include(x => x.Group)
+                .Include(x => x.Images).Include(x => x.PostTagEntities).Select(x => x).FirstOrDefault();
+
+                var tags = post.PostTagEntities.SelectMany(x => _context.PostTags.Where(y => y.Id == x.PostTagId));
+
+                string tagsString = string.Concat(tags.Select(x => "#" + x.Tag + " ")).Trim();
+
+                if(post != null)
+                {
+                    var returnedData = _mapper.Map<IPublicationData>(post);
+                    returnedData.Tags = tagsString;
+                    res = Ok(returnedData);
+                    return res;
+                }
+
+                res = BadRequest(new
+                {
+                    Errors = new string[]
+                    {
+                        "Не знайдено публікацію!"
+                    }
+                });
+                return res;
+            });
+        }
+
+        [HttpPost]
+        [Route("imagedynamicupdate")]
+        public async Task<IActionResult> AddImageDynamic([FromBody] IEditDynamicImage image)
+        {
+            return await Task.Run(() =>
+            {
+                AppPostImage appImage = new AppPostImage();
+                appImage.PostId = image.PostId;
+                appImage.Image = image.Image;
+
+                _context.PostImages.Add(appImage);
+                _context.SaveChanges();
+                return Ok();
             });
         }
 
