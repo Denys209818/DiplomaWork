@@ -18,6 +18,13 @@ using Volonterio.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+    builder.WebHost
+    .UseKestrel(options =>
+    {
+        options.Limits.MaxRequestBodySize = long.MaxValue;
+    });
+    
+
 // Add services to the container.
 
 builder.Services.AddControllers();

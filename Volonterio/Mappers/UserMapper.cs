@@ -2,6 +2,7 @@
 using Volonterio.Data.Entities;
 using Volonterio.Data.Entities.CustomEntities;
 using Volonterio.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Volonterio.Mappers
 {
@@ -48,6 +49,16 @@ namespace Volonterio.Mappers
                 .ForMember(x=> x.Title, y => y.MapFrom(x => x.Title))
                 .ForMember(x=> x.Description, y => y.MapFrom(x => x.Text))
                 .ForMember(x=> x.Images, y => y.MapFrom(x => x.Images.Select(x => x.Image)))
+                ;
+
+            CreateMap<AppPost, IPublicationData>()
+                .ForMember(x => x.Id, y => y.MapFrom(z => z.Id))
+                .ForMember(x => x.Title, y => y.MapFrom(z => z.Title))
+                .ForMember(x => x.Description, y => y.MapFrom(z => z.Text))
+                .ForMember(x => x.GroupId, y => y.MapFrom(z => z.GroupId))
+                .ForMember(x => x.UserId, y => y.MapFrom(z => z.Group.UserId))
+                .ForMember(x => x.Images, y => y.MapFrom(x => x.Images.Select(x => x.Image)))
+                .ForMember(x => x.Tags, y => y.Ignore())
                 ;
         }
     }

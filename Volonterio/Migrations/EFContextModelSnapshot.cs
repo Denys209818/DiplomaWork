@@ -438,41 +438,6 @@ namespace Volonterio.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("tblAppUserGroup", (string)null);
-
-            modelBuilder.Entity("Volonterio.Models.FriendChatModels", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("UserOneId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserTwoId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("tblFriendChat");
-                });
-
-            modelBuilder.Entity("Volonterio.Models.GroupChatModels", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("tblGroupChat");
                 });
 
             modelBuilder.Entity("Volonterio.Models.GroupsModels", b =>
@@ -497,36 +462,7 @@ namespace Volonterio.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("tblGroups");
-                });
-
-            modelBuilder.Entity("Volonterio.Models.MessageModels", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ChadId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<long>("DateCreatedUnix")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("tblMessage");
+                    b.ToTable("tblGroups", (string)null);
                 });
 
             modelBuilder.Entity("Volonterio.Models.PublicationsModels", b =>
@@ -556,7 +492,7 @@ namespace Volonterio.Migrations
 
                     b.HasIndex("GroupsId");
 
-                    b.ToTable("tblPublications");
+                    b.ToTable("tblPublications", (string)null);
                 });
 
             modelBuilder.Entity("Volonterio.Models.PublicationsTagsModel", b =>
@@ -571,7 +507,7 @@ namespace Volonterio.Migrations
 
                     b.HasIndex("TegsId");
 
-                    b.ToTable("tblPublicationsTags");
+                    b.ToTable("tblPublicationsTags", (string)null);
                 });
 
             modelBuilder.Entity("Volonterio.Models.TagsModels", b =>
@@ -589,7 +525,7 @@ namespace Volonterio.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("tblTags");
+                    b.ToTable("tblTags", (string)null);
                 });
 
             modelBuilder.Entity("Volonterio.Models.UsersModels", b =>
@@ -632,7 +568,7 @@ namespace Volonterio.Migrations
 
                     b.HasIndex("GroupsId");
 
-                    b.ToTable("tblUsers");
+                    b.ToTable("tblUsers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>

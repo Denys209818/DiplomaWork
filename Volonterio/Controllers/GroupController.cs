@@ -86,13 +86,21 @@ namespace Volonterio.Controllers
 
         }
 
-        [HttpDelete]
+        [HttpPost]
         [Route("delete")]
         public async Task<IActionResult> DeleteGroup([FromBody] DeleteGroup delete)
         {
             IActionResult res = Ok("Групу видалено!");
             return await Task.Run(() =>
             {
+                var userGroups = _context.UserGroups.Where(x => x.GroupId == delete.GroupId).ToList();
+                if(userGroups != null)
+                {
+                    _context.UserGroups.RemoveRange(userGroups);
+                    _context.SaveChanges();
+                }
+
+
                 var group = _context.Groups.Where(x => x.Id == delete.GroupId).FirstOrDefault();
                 if(group == null) 
                 {
@@ -108,7 +116,10 @@ namespace Volonterio.Controllers
                     string dir = Path.Combine(Directory.GetCurrentDirectory(), "Images", "Group", group.Image);
                     if(System.IO.File.Exists(dir))
                     {
-                        System.IO.File.Delete(dir);
+                        if(group.Image != "default.jpg")
+                        {
+                            System.IO.File.Delete(dir);
+                        }
                     }
                 }
 
@@ -137,24 +148,30 @@ namespace Volonterio.Controllers
                     group.Meta = edit.Meta;
                     group.Description = edit.Description;
 
-                    if(!string.IsNullOrEmpty(edit.ImageBase64))
+                    string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Images", "Group");
+                    if(!string.IsNullOrEmpty(edit.ImageBase64) && edit.ImageBase64 != "default.jpg")
                     {
-                        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Images", "Group");
-                        if(System.IO.File.Exists(Path.Combine(filePath, group.Image)))
-                        {
-                            System.IO.File.Delete(Path.Combine(filePath, group.Image));
-                        }
+                        DeleteImage(filePath, group.Image);
+
                         string fileName = Path.GetRandomFileName() + ".jpg";
-                        Bitmap bmp = ImageWorker.ConvertToBitmap(edit.ImageBase64);
+                        Bitmap bmp = ImageWorker.ConvertToBitmap(edit.ImageBase64.Split(",")[1]);
 
                         bmp.Save(Path.Combine(filePath, fileName));
                         group.Image = fileName;
+
+                    }else if(edit.ImageBase64 == "default.jpg")
+                    {
+                        DeleteImage(filePath, group.Image);
+                        
+                        group.Image = "default.jpg";
                     }
 
                     DeleteTags(edit.GroupId);
                     ///////////////////
                     SetTags(edit.Tags, group);
 
+                    _context.SaveChanges();
+                    res = Ok(group.Image);
                 }
                 else
                 {
@@ -237,14 +254,19 @@ namespace Volonterio.Controllers
                 IActionResult res = null;
                 try
                 {
+                    var groups = _context.Groups.Include(x => x.AppGroupTags).Where(x => _context.UserGroups
+                    .Where(y => y.GroupId == x.Id &&
+                    y.UserId == getModel.Id).Any() || x.UserId == getModel.Id).ToList().Select(x => new
+                    {
+                        Id = x.Id,
+                        Title = x.Title,
+                        Meta = x.Meta,
+                        Description = x.Description,
+                        UserId = x.UserId,
+                        Image = x.Image,
+                        Tags = SetStringTag(x.AppGroupTags)
+                    }).ToList();
 
-                    //var list = _context.Groups.Where(x => x.UserId == getModel.Id)
-                    //.Select(x => _mapper.Map<GetByIdResult>(x)).ToList();
-
-
-                    var groups = _context.Groups.Where(x => _context.UserGroups.Where(y => (y.GroupId == x.Id &&
-                    y.UserId == getModel.Id) || x.UserId == getModel.Id).Any()).Select(x => x).ToList();
-                    //|| x.UserId == getModel.Id).Any()
                     res = Ok(groups);
                     return res;
 
@@ -310,15 +332,17 @@ namespace Volonterio.Controllers
         {
             return await Task.Run(() =>
             {
-                return Ok(_context.Groups.Where(x => x.Id == id).Select(x => new
+                return Ok(_context.Groups.Include(x => x.AppGroupTags).Where(x => x.Id == id).ToList().Select(x => new
                 {
                     Id = x.Id,
-                    Title= x.Title,
-                    Meta =x.Meta,
+                    Title = x.Title,
+                    Meta = x.Meta,
                     Descrption = x.Description,
-                    Image= x.Image
+                    Image = x.Image,
+                    UserId = x.UserId,
+                    Tags = SetStringTag(x.AppGroupTags)
 
-                }).FirstOrDefault());
+                }).FirstOrDefault()) ;
             });
         }
 
@@ -337,6 +361,24 @@ namespace Volonterio.Controllers
                         UserId = subscribe.UserId
                     });
 
+                    _context.SaveChanges();
+                }
+                return Ok();
+            });
+        }
+
+        [HttpPost]
+        [Route("delusergroup")]
+        public async Task<IActionResult> DeleteUserGroup([FromBody] SubscribeModal unsubscribe)
+        {
+            return await Task.Run(() =>
+            {
+                var userGroup = _context.UserGroups.Where(x => x.GroupId == 
+                unsubscribe.GroupId && x.UserId == unsubscribe.UserId).FirstOrDefault();
+
+                if(userGroup != null)
+                {
+                    _context.UserGroups.Remove(userGroup);
                     _context.SaveChanges();
                 }
                 return Ok();
@@ -375,7 +417,7 @@ namespace Volonterio.Controllers
                     if (tagItem == null)
                     {
                         AppTag appTagItem = new AppTag();
-                        appTagItem.Tag = tag;
+                        appTagItem.Tag = tag.Trim(' ');
 
                         _context.Tags.Add(appTagItem);
                         _context.SaveChanges();
@@ -403,6 +445,30 @@ namespace Volonterio.Controllers
             _context.SaveChanges();
 
 
+        }
+
+        private string SetStringTag(IEnumerable<AppGroupTag> groupTags)
+        {
+            List<string> tags = new List<string>();
+            foreach (var groupTag in groupTags)
+            {
+               tags.Add("#" + _context.Tags.Where(x => x.Id == groupTag.TagId).First().Tag + " ");
+            }
+
+            string tag = String.Concat(tags);
+            return tag.Trim();
+        }
+
+        private void DeleteImage(string fullPath, string fileName)
+        {
+            string fullFileName = Path.Combine(fullPath, fileName);
+            if (System.IO.File.Exists(fullFileName))
+            {
+                if (fileName != "default.jpg")
+                {
+                    System.IO.File.Delete(fullFileName);
+                }
+            }
         }
     }
 }
