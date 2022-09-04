@@ -310,6 +310,21 @@ namespace Volonterio.Migrations
                     b.ToTable("tblAppGroupTag", (string)null);
                 });
 
+            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppLike", b =>
+                {
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId", "PostId");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("tblAppLikes", (string)null);
+                });
+
             modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppPost", b =>
                 {
                     b.Property<int>("Id")
@@ -440,6 +455,42 @@ namespace Volonterio.Migrations
                     b.ToTable("tblAppUserGroup", (string)null);
                 });
 
+            modelBuilder.Entity("Volonterio.Models.FriendChatModels", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserOneId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserTwoId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tblFriendChat");
+                });
+
+            modelBuilder.Entity("Volonterio.Models.GroupChatModels", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tblGroupChat");
+                });
+
             modelBuilder.Entity("Volonterio.Models.GroupsModels", b =>
                 {
                     b.Property<int>("Id")
@@ -462,7 +513,36 @@ namespace Volonterio.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("tblGroups", (string)null);
+                    b.ToTable("tblGroups");
+                });
+
+            modelBuilder.Entity("Volonterio.Models.MessageModels", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChadId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("DateCreatedUnix")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tblMessage");
                 });
 
             modelBuilder.Entity("Volonterio.Models.PublicationsModels", b =>
@@ -492,7 +572,7 @@ namespace Volonterio.Migrations
 
                     b.HasIndex("GroupsId");
 
-                    b.ToTable("tblPublications", (string)null);
+                    b.ToTable("tblPublications");
                 });
 
             modelBuilder.Entity("Volonterio.Models.PublicationsTagsModel", b =>
@@ -507,7 +587,7 @@ namespace Volonterio.Migrations
 
                     b.HasIndex("TegsId");
 
-                    b.ToTable("tblPublicationsTags", (string)null);
+                    b.ToTable("tblPublicationsTags");
                 });
 
             modelBuilder.Entity("Volonterio.Models.TagsModels", b =>
@@ -525,7 +605,7 @@ namespace Volonterio.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("tblTags", (string)null);
+                    b.ToTable("tblTags");
                 });
 
             modelBuilder.Entity("Volonterio.Models.UsersModels", b =>
@@ -568,7 +648,7 @@ namespace Volonterio.Migrations
 
                     b.HasIndex("GroupsId");
 
-                    b.ToTable("tblUsers", (string)null);
+                    b.ToTable("tblUsers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
@@ -673,6 +753,25 @@ namespace Volonterio.Migrations
                     b.Navigation("Group");
 
                     b.Navigation("Tag");
+                });
+
+            modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppLike", b =>
+                {
+                    b.HasOne("Volonterio.Data.Entities.CustomEntities.AppPost", "Post")
+                        .WithMany("Likes")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Volonterio.Data.Entities.AppUser", "User")
+                        .WithMany("Likes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppPost", b =>
@@ -787,6 +886,8 @@ namespace Volonterio.Migrations
 
                     b.Navigation("Groups");
 
+                    b.Navigation("Likes");
+
                     b.Navigation("UserGroups");
 
                     b.Navigation("UserRoles");
@@ -804,6 +905,8 @@ namespace Volonterio.Migrations
             modelBuilder.Entity("Volonterio.Data.Entities.CustomEntities.AppPost", b =>
                 {
                     b.Navigation("Images");
+
+                    b.Navigation("Likes");
 
                     b.Navigation("PostTagEntities");
                 });

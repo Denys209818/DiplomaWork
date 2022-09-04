@@ -45,6 +45,7 @@
         public string Title { get; set; }
         public string Description { get; set; }
         public List<string> Images { get; set; }
+        public bool IsLiked { get; set; }
     }
 
     public class IPublicationData
@@ -61,6 +62,12 @@
     public class IEditDynamicImage
     {
         public string Image { get; set; }
+        public int PostId { get; set; }
+    }
+
+    public class ILikePostModel
+    {
+        public bool Liked { get; set; }
         public int PostId { get; set; }
     }
 }

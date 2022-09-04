@@ -8,6 +8,7 @@
         public virtual ICollection<AppPostImage> Images { get; set; }
         public virtual ICollection<AppPostTagEntity> PostTagEntities { get; set; }
 
+        public virtual ICollection<AppLike> Likes { get; set; }
 
         public int GroupId { get; set; }
         public virtual AppGroup Group { get; set; }

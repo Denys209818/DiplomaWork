@@ -58,7 +58,8 @@ builder.Services.AddAuthentication((AuthenticationOptions opts) => {
         jwt.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateLifetime = false,
-            ValidateIssuer = true,
+            ValidateIssuer = false,
+
             ValidateIssuerSigningKey = true,
             ValidateAudience = false,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(

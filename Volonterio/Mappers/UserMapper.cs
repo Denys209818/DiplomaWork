@@ -49,6 +49,7 @@ namespace Volonterio.Mappers
                 .ForMember(x=> x.Title, y => y.MapFrom(x => x.Title))
                 .ForMember(x=> x.Description, y => y.MapFrom(x => x.Text))
                 .ForMember(x=> x.Images, y => y.MapFrom(x => x.Images.Select(x => x.Image)))
+                .ForMember(x => x.IsLiked, y => y.MapFrom(x => false))
                 ;
 
             CreateMap<AppPost, IPublicationData>()

@@ -10,6 +10,7 @@ namespace Volonterio.Data.Entities
         public string PhoneNumber { get; set; }
         public string Image { get; set; }
         public virtual ICollection<AppGroup> Groups { get; set; }
+        public virtual ICollection<AppLike> Likes { get; set; }
 
         public virtual ICollection<AppUserRole> UserRoles { get; set; }
 
