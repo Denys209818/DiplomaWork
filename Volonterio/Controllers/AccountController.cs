@@ -6,6 +6,7 @@ using System.Drawing;
 using Volonterio.Constants;
 using Volonterio.Data;
 using Volonterio.Data.Entities;
+using Volonterio.Data.Entities.CustomEntities;
 using Volonterio.Models;
 using Volonterio.Services;
 
@@ -19,11 +20,13 @@ namespace Volonterio.Controllers
         private IMapper _mapper;
         private UserManager<AppUser> _userManager;
         private IJwtBearerService _jwtBearer;
-        public AccountController(IMapper mapper, UserManager<AppUser> userManager, IJwtBearerService jwtBearer)
+        public EFContext _context { get; set; }
+        public AccountController(IMapper mapper, UserManager<AppUser> userManager, IJwtBearerService jwtBearer, EFContext context)
         {
             _mapper = mapper;
             _userManager = userManager;
             _jwtBearer = jwtBearer;
+            _context = context;
         }
 
         [HttpPost]
@@ -344,6 +347,16 @@ namespace Volonterio.Controllers
             });
         }
 
+       [HttpGet]
+        [Route("reading")]
+        public async Task<IActionResult> ReturnUser([FromBody] AppUserFriend appUserFriend)
+        {
+            return await Task.Run(() =>
+            {
+                var list = _context.UserFriends.ToList();
+                return Ok(list);
+            });
+        }
 
     }
 }
