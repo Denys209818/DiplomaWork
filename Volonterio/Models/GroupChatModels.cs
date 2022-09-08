@@ -14,4 +14,7 @@ namespace Volonterio.Models
         //public virtual ICollection<MessageModels> Messages { get; set; }
 
     }
+
+
+
 }

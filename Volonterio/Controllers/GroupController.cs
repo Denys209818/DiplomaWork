@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -88,6 +89,7 @@ namespace Volonterio.Controllers
 
         [HttpPost]
         [Route("delete")]
+        [Authorize]
         public async Task<IActionResult> DeleteGroup([FromBody] DeleteGroup delete)
         {
             IActionResult res = Ok("Групу видалено!");
@@ -101,6 +103,8 @@ namespace Volonterio.Controllers
                 }
 
 
+                
+
                 var group = _context.Groups.Where(x => x.Id == delete.GroupId).FirstOrDefault();
                 if(group == null) 
                 {
@@ -111,7 +115,17 @@ namespace Volonterio.Controllers
                     return res;
                 }
 
-                if(!string.IsNullOrEmpty(group.Image))
+                var userId = User.Claims.Where(x => x.Type == "id").First().Value;
+
+                if (userId == null || int.Parse(userId) != group.UserId)
+                {
+                    res = BadRequest(new
+                    {
+                        Message = "Користувач не має права на видалення групи!"
+                    });
+                }
+
+                if (!string.IsNullOrEmpty(group.Image))
                 {
                     string dir = Path.Combine(Directory.GetCurrentDirectory(), "Images", "Group", group.Image);
                     if(System.IO.File.Exists(dir))
@@ -136,6 +150,7 @@ namespace Volonterio.Controllers
 
         [HttpPost]
         [Route("edit")]
+        [Authorize]
         public async Task<IActionResult> EditGroup([FromBody] EditGroup edit) 
         {
             IActionResult res = Ok("Відредаговано!");
@@ -144,6 +159,17 @@ namespace Volonterio.Controllers
                 var group = _context.Groups.Where(x => x.Id == edit.GroupId).FirstOrDefault();
                 if (group != null)
                 {
+                    var userId = User.Claims.Where(x => x.Type == "id").First().Value;
+
+                    if (userId == null || int.Parse(userId) != group.UserId)
+                    {
+                        res = BadRequest(new
+                        {
+                            Message = "Користувач не має права на редагування групи!"
+                        });
+                    }
+
+
                     group.Title = edit.Title;
                     group.Meta = edit.Meta;
                     group.Description = edit.Description;

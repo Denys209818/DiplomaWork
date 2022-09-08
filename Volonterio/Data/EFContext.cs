@@ -33,6 +33,10 @@ namespace Volonterio.Data
         public DbSet<AppPostTagEntity> PostTagEntities { get; set; }
         public DbSet<AppGroupTag> GroupTags { get; set; }
         public DbSet<AppUserGroup> UserGroups { get; set; }
+        public DbSet<AppLike> Likes { get; set; }
+        public DbSet<AppGroupMessage> GroupMessages { get; set; }
+        public DbSet<AppFriendMessage> FriendMessages { get; set; }
+
 
         public DbSet<MessageModels> messages { get; set; }
         public DbSet<FriendChatModels> friendChats { get; set; }
@@ -58,6 +62,9 @@ namespace Volonterio.Data
             builder.ApplyConfiguration(new PostTagEntitiesConfiguration());
             builder.ApplyConfiguration(new GroupTagConfiguration());
             builder.ApplyConfiguration(new UserGroupConfiguration());
+            builder.ApplyConfiguration(new LikeConfiguration());
+            builder.ApplyConfiguration(new FriendMessageConfiguration());
+            builder.ApplyConfiguration(new GroupMessageConfiguration());
 
 
 

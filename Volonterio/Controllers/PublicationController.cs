@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -88,12 +89,14 @@ namespace Volonterio.Controllers
 
         [HttpPost]
         [Route("delete")]
+        [Authorize]
         public async Task<IActionResult> DeletePublication([FromBody] DeletePublicationModel delete)
         {
             IActionResult res = Ok("Публікацію видалено!");
             return await Task.Run(() =>
             {
-                var publication = _context.Post.Include(x=> x.PostTagEntities).Where(x => x.Id == delete.PostId).FirstOrDefault();
+                var publication = _context.Post.Include(x=> x.PostTagEntities).Include(x => x.Group)
+                .Where(x => x.Id == delete.PostId).FirstOrDefault();
                 if (publication == null)
                 {
                     res = BadRequest(new
@@ -101,6 +104,17 @@ namespace Volonterio.Controllers
                         Message = "Публікації не існує!"
                     });
                     return res;
+                }
+
+
+                var userId = User.Claims.Where(x => x.Type == "id").First().Value;
+
+                if (userId == null || int.Parse(userId) != publication.Group.UserId)
+                {
+                    res = BadRequest(new
+                    {
+                        Message = "Користувач не має права на видалення публікації!"
+                    });
                 }
 
                 var postTagIdList = publication.PostTagEntities.Select(x => x.PostTagId).ToList();
@@ -133,13 +147,27 @@ namespace Volonterio.Controllers
 
         [HttpPost]
         [Route("edit")]
+        [Authorize]
         public async Task<IActionResult> EditPublication([FromBody] EditPublicationModel edit)
         {
             IActionResult res = Ok("Успішно відредаговано!");
             return await Task.Run(() =>
             {
-                var publication = _context.Post.Include(x => x.Images).Include(x => x.PostTagEntities)
+                var publication = _context.Post.Include(x => x.Images).Include(x => x.Group
+                ).Include(x => x.PostTagEntities)
                 .Where(x => x.Id == edit.PublicationId).FirstOrDefault();
+
+
+                var userId = User.Claims.Where(x => x.Type == "id").First().Value;
+
+                if (userId == null || int.Parse(userId) != publication.Group.UserId)
+                {
+                    res = BadRequest(new
+                    {
+                        Message = "Користувач не має права на редагування публікації!"
+                    });
+                }
+
                 if (publication == null)
                 {
                     res = BadRequest(new
@@ -211,38 +239,7 @@ namespace Volonterio.Controllers
                     }
                 }
 
-                //
-                //if (edit.Images != null && edit.Images.Count() > 0)
-                //{
-                //    foreach (var image in edit.Images)
-                //    {
-                //        string fullPath = Path.Combine(
-                //            Directory.GetCurrentDirectory(), "Images", "Post", image.Image);
-                //        var postImg = _context.PostImages.Where(x => x.PostId == publication.Id
-                //        && x.Image.ToLower() == image.Image.ToLower()).FirstOrDefault();
-                //        if (postImg == null)
-                //        {
-
-                //            AppPostImage img = new AppPostImage
-                //            {
-                //                Image = image.Image,
-                //                Post = publication
-                //            };
-
-                //            _context.PostImages.Add(img);
-                //            _context.SaveChanges();
-
-                //        }
-                //        else
-                //        {
-                //            if (!System.IO.File.Exists(fullPath))
-                //            {
-                //                _context.PostImages.Remove(postImg);
-                //            }
-                //        }
-                //    }
-                //}
-
+               
                 _context.SaveChanges();
                 return res;
             });
@@ -283,16 +280,33 @@ namespace Volonterio.Controllers
 
         [HttpPost]
         [Route("getpostbygroupid")]
+        [Authorize]
         public async Task<IActionResult> GetPostByGroupId([FromBody] int id)
         {
             return await Task.Run(() =>
             {
+                var userId = User.Claims.Where(x => x.Type == "id").First().Value;
+
                 var posts = _context.Post.Include(x => x.Images).Where(x => x.GroupId == id)
                 .Select(x => _mapper.Map<GetPostByGroupId>(x)).ToList();
+
+              
                 if (posts != null)
                 {
                     foreach (GetPostByGroupId post in posts)
                     {
+                        if (userId != null)
+                        {
+                            var like = _context.Likes.FirstOrDefault(x => x.PostId == post.Id 
+                            && x.UserId == int.Parse(userId));
+
+                            if(like != null)
+                            {
+                                post.IsLiked = true;
+                            }
+                        }
+
+
                         foreach (var postImage in post.Images)
                         {
                             if (!string.IsNullOrEmpty(postImage))
@@ -370,6 +384,42 @@ namespace Volonterio.Controllers
                 appImage.Image = image.Image;
 
                 _context.PostImages.Add(appImage);
+                _context.SaveChanges();
+                return Ok();
+            });
+        }
+
+        [HttpPost]
+        [Route("likepost")]
+        [Authorize]
+        public async Task<IActionResult> LikePost([FromBody] ILikePostModel like)
+        {
+            return await Task.Run(() =>
+            {
+                var userId = User.Claims.Where(x => x.Type == "id").First().Value;
+                var liked = _context.Likes.Where(x => x.UserId == int.Parse(userId) && x.PostId == like.PostId)
+                .FirstOrDefault();
+                if (like.Liked)
+                {
+                    if(liked == null)
+                    {
+                        var newLike = new AppLike
+                        {
+                            PostId = like.PostId,
+                            UserId = long.Parse(userId),
+                        };
+
+                        _context.Likes.Add(newLike);
+                    }
+                }
+                else
+                {
+                    if (liked != null)
+                    {
+
+                        _context.Likes.Remove(liked);
+                    }
+                }
                 _context.SaveChanges();
                 return Ok();
             });
