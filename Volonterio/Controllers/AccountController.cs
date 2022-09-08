@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Drawing;
 using Volonterio.Constants;
 using Volonterio.Data;
 using Volonterio.Data.Entities;
+using Volonterio.Data.Entities.CustomEntities;
 using Volonterio.Models;
 using Volonterio.Services;
 
@@ -19,11 +22,14 @@ namespace Volonterio.Controllers
         private IMapper _mapper;
         private UserManager<AppUser> _userManager;
         private IJwtBearerService _jwtBearer;
-        public AccountController(IMapper mapper, UserManager<AppUser> userManager, IJwtBearerService jwtBearer)
+        private EFContext _context;
+        public AccountController(IMapper mapper, UserManager<AppUser> userManager,
+            IJwtBearerService jwtBearer, EFContext context)
         {
             _mapper = mapper;
             _userManager = userManager;
             _jwtBearer = jwtBearer;
+            _context = context;
         }
 
         [HttpPost]
@@ -258,7 +264,7 @@ namespace Volonterio.Controllers
 
                 if (user != null)
                 {
-                    if (changeImage.ImageBase64 != null)
+                    if (!string.IsNullOrEmpty(changeImage.ImageBase64))
                     {
                         if(changeImage.ImageBase64.Equals("default.jpg"))
                         {
@@ -322,6 +328,10 @@ namespace Volonterio.Controllers
                         }
 
                     }
+                    else if(changeImage.ImageBase64 == "") 
+                    {
+                        return Ok();
+                    }
                     else
                     {
                         res = BadRequest(new
@@ -344,6 +354,38 @@ namespace Volonterio.Controllers
             });
         }
 
+        [HttpGet("friends")]
+        [Authorize]
+        public async Task<IActionResult> GetAllFriends()
+        {
+            int userId = int.Parse(User.Claims.Where(x => x.Type
+            == "id").First().Value);
+            return await Task.Run(() =>
+            {
+                var friendsGroups = _context.UserFriends.Include(x => x.AppFriends).Where(x => x.AppFriends
+                .Where(y => y.UserId == userId).Any()).Select(x => x.AppFriends).ToList();
 
+                List<UserFriendReturned> appUsers = new List<UserFriendReturned>();
+
+                foreach (var friendColl in friendsGroups)
+                {
+                    var friend = friendColl.Where(x => x.UserId != userId).First();
+                    if(friend != null)
+                    {
+                        var user = _userManager.FindByIdAsync(friend.UserId.ToString()).Result;
+                        UserFriendReturned ret = new UserFriendReturned();
+                        ret.ChatId = "UserChatId"+friend.UserFriendId;
+                        ret.Id = user.Id;
+                        ret.Image = user.Image;
+                        ret.FirstName = user.FirstName;
+                        ret.SecondName = user.SecondName;
+                        ret.Phone = user.PhoneNumber;
+                        ret.Email = user.Email;
+                        appUsers.Add(ret);  
+                    }
+                }
+                return Ok(appUsers);
+            });
+        }
     }
 }

@@ -37,4 +37,33 @@
         public string Email { get; set; }
         public string ImageBase64 { get; set; }
     }
+
+    public class UserFriendReturned
+    {
+        public long Id { get; set; }
+        public string Email { get; set; }
+        public string SecondName { get; set; }
+        public string FirstName { get; set; }
+        public string Phone { get; set; }
+        public string Image { get; set; }
+        public string ChatId { get; set; }
+    }
+
+    public class FriendMessageInfo
+    {
+        public string Message { get; set; }
+        public DateTime Date { get; set; }
+        public string FullName { get; set; }
+        public long UserId { get; set; }
+        public string Image { get; set; }
+    }
+
+    public class ChatFriend
+    {
+        public string Message { get; set; }
+        public DateTime Date { get; set; }
+        public string FullName { get; set; }
+        public int ChatId { get; set; }
+        public string Image { get; set; }
+    }
 }

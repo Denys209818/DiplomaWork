@@ -40,10 +40,10 @@ namespace Volonterio.Data.Services
                 {
                     UserName = "admin@gmail.com",
                     Email = "admin@gmail.com",
-                    PhoneNumber = "38000000000",
+                    PhoneNumber = "+38(068) 016 23-21",
                     FirstName = "Denys",
                     SecondName = "Kravchuk",
-                    Image = "1.jpg"
+                    Image = "default.jpg"
                 };
                 var res = userManager.CreateAsync(user,"qwerty").Result;
 

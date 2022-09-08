@@ -12,5 +12,7 @@
         public virtual ICollection<AppGroupTag> AppGroupTags { get; set; }
         public virtual ICollection<AppPost> Posts { get; set; }
         public virtual ICollection<AppUserGroup> UserGroups { get; set; }
+        public virtual ICollection<AppGroupMessage> GroupMessages { get; set; }
+
     }
 }

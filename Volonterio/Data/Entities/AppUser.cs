@@ -13,8 +13,11 @@ namespace Volonterio.Data.Entities
         public virtual ICollection<AppLike> Likes { get; set; }
 
         public virtual ICollection<AppUserRole> UserRoles { get; set; }
+        public virtual ICollection<AppGroupMessage> GroupMessages { get; set; }
 
         public virtual ICollection<AppFriend> Friends { get; set; }
         public virtual ICollection<AppUserGroup> UserGroups { get; set; }
+        public virtual ICollection<AppFriendMessage> FriendMessages { get; set; }
+
     }
 }

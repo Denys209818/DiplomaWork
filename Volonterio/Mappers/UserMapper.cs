@@ -61,6 +61,27 @@ namespace Volonterio.Mappers
                 .ForMember(x => x.Images, y => y.MapFrom(x => x.Images.Select(x => x.Image)))
                 .ForMember(x => x.Tags, y => y.Ignore())
                 ;
+
+
+            ///Chat
+            ///
+            CreateMap<IAddMessage, AppGroupMessage>()
+                .ForMember(x => x.Message, y => y.MapFrom(z => z.Message))
+                .ForMember(x => x.DateCreated, y => y.MapFrom(z => z.DateCreated))
+                .ForMember(x => x.GroupId, y => y.MapFrom(z => z.GroupId))
+                .ForMember(x => x.UserId, y => y.Ignore())
+                .ForMember(x => x.Id, y => y.Ignore())
+                .ForMember(x => x.Group, y => y.Ignore())
+                .ForMember(x => x.User, y => y.Ignore())
+                ;
+
+            CreateMap<AppFriendMessage, FriendMessageInfo>()
+                .ForMember(x => x.Message, y => y.MapFrom(z => z.Message))
+                .ForMember(x => x.Date, y => y.MapFrom(z => z.DateCreated))
+                .ForMember(x => x.UserId, y => y.MapFrom(z => z.UserId))
+                .ForMember(x => x.Image, y => y.Ignore())
+                .ForMember(x => x.FullName, y => y.Ignore())
+                ;
         }
     }
 }
