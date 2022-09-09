@@ -94,6 +94,16 @@ namespace Volonterio.Mappers
                 .ForMember(x => x.CountLikes, y => y.Ignore())
                 .ForMember(x => x.Id, y => y.MapFrom(x => x.Id))
                 ;
+
+            CreateMap<AppPost, GetPostByGroupIdSortedPopular>()
+                .ForMember(x => x.Title, y => y.MapFrom(x => x.Title))
+                .ForMember(x => x.Description, y => y.MapFrom(x => x.Text))
+                .ForMember(x => x.Images, y => y.MapFrom(x => x.Images.Select(x => x.Image)))
+                .ForMember(x => x.Id, y => y.MapFrom(x => x.Id))
+                .ForMember(x => x.CountLikes, y => y.Ignore())
+                .ForMember(x => x.GroupImage, y => y.Ignore())
+                .ForMember(x => x.GroupName, y => y.Ignore())
+                ;
         }
     }
 }
