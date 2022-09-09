@@ -387,5 +387,25 @@ namespace Volonterio.Controllers
                 return Ok(appUsers);
             });
         }
+
+        [HttpGet]
+        [Authorize]
+        [Route("getuserdata")]
+        public async Task<IActionResult> GetUserData()
+        {
+            long userId = long.Parse(User.Claims.Where(x => x.Type == "id").First().Value);
+            return await Task.Run(() =>
+            {
+                int groupsCount = _context.Groups.Where(x => x.UserId == userId).Count();
+                int postsCount = _context.Post.Include(x => x.Group).Where(x => x.Group.UserId == userId)
+                .Select(x => x).Count();
+                int friendsCount = _context.Friends.Where(x => x.UserId == userId).Count();
+                UserDataProfile profileData = new UserDataProfile();
+                profileData.FriendsCount= friendsCount;
+                profileData.PostsCount = postsCount;
+                profileData.GroupsCount = groupsCount;
+                return Ok(profileData);
+            });
+        }
     }
 }

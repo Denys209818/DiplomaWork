@@ -125,7 +125,7 @@ app.UseStaticFiles(new StaticFileOptions {
 
 app.MapControllers();
 
-app.Run();
+//app.Run();
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 await app.RunAsync();

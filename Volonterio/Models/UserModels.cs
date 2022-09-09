@@ -66,4 +66,11 @@
         public int ChatId { get; set; }
         public string Image { get; set; }
     }
+
+    public class UserDataProfile
+    {
+        public int PostsCount { get; set; }
+        public int GroupsCount { get; set; }
+        public int FriendsCount { get; set; }
+    }
 }
