@@ -485,6 +485,32 @@ namespace Volonterio.Controllers
             });
         }
 
+        [HttpGet]
+        [Route("getpopularposts")]
+        public async Task<IActionResult> GetPopularPosts([FromQuery] int items)
+        {
+            return await Task.Run(() =>
+            {
+                var list = _context.Post.Include(x => x.Images).Include(x => x.Likes)
+                .OrderByDescending(x => x.Likes.Count).Take(items).Select(x => 
+                _mapper.Map<GetPostByGroupIdSortedPopular>(x)).ToList();
+
+
+
+                foreach (var item in list)
+                {
+                    var group = _context.Groups.Include(x => x.Posts)
+                    .Where(x => x.Posts.Where(x => x.Id == item.Id).Any()).First();
+
+                    var likes = _context.Likes.Where(x => x.PostId == item.Id).Count();
+                    item.GroupName = group.Title;
+                    item.GroupImage = group.Image;
+                    item.CountLikes = likes;
+                }
+                return Ok(list);
+            });
+        }
+
         //Custom Methods
         private void SetTags(string Tags, AppPost post)
         {
