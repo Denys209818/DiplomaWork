@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using Volonterio.Data;
+using Volonterio.Data.Entities;
 using Volonterio.Data.Entities.CustomEntities;
 using Volonterio.Models;
 using Volonterio.Services;
@@ -17,10 +20,12 @@ namespace Volonterio.Controllers
     {
         public IMapper _mapper { get; set; }
         public EFContext _context { get; set; }
-        public PublicationController(IMapper mapper, EFContext context)
+        public UserManager<AppUser> _userManager { get; set; }
+        public PublicationController(IMapper mapper, EFContext context, UserManager<AppUser> userManager)
         {
             _mapper = mapper;
             _context = context;
+            _userManager = userManager;
         }
 
         [HttpPost]
@@ -425,6 +430,61 @@ namespace Volonterio.Controllers
             });
         }
 
+        [HttpGet]
+        [Route("getpopularfromgroupbyuserid")]
+        [Authorize]
+        public async Task<IActionResult> GetPopularPostByUserId()
+        {
+            long userId = long.Parse(User.Claims.Where(x => x.Type == "id").First().Value);
+            return await Task.Run(() =>
+            {
+                var groupsId =  _context.Groups.Include(x => x.AppGroupTags).Where(x => _context.UserGroups
+                    .Where(y => y.GroupId == x.Id &&
+                    y.UserId == userId).Any() || x.UserId == userId).ToList().Select(x => x.Id).ToList();
+                List<AppPost> appPosts = new List<AppPost>();
+                foreach (var groupId in groupsId)
+                {
+                    var posts = _context.Post.Include(x=> x.PostTagEntities)
+                    .Include(x => x.Images).Include(x => x.Group).Where(x => x.GroupId == groupId).ToList();
+                    appPosts.AddRange(posts);
+
+                }
+
+                 appPosts.Sort(new ComparerForPosts());
+                appPosts.Reverse();
+                var list = appPosts.Select(x => _mapper.Map<GetPostByGroupIdSorted>(x)).ToList();
+
+                int index = 0;
+                foreach (var appPost in appPosts)
+                {
+                    List<string> postTags = new List<string>();
+                    foreach (var postTag in appPost.PostTagEntities)
+                    {
+                        var item = _context.PostTags.Where(x => x.Id == postTag.PostTagId).FirstOrDefault();
+
+                        string tag = item.Tag;
+                        postTags.Add(tag);
+                    }
+
+                    string readyTags = string.Concat(postTags.Select(x => "#" + x + " ")).Trim();
+                    list[index].Tags = readyTags;
+                    var userObj = _userManager.FindByIdAsync(userId.ToString()).Result;
+                    list[index].UserName = userObj.FirstName + " " + userObj.SecondName;
+                    list[index].UserEmail = userObj.Email;
+                    list[index].UserImage = userObj.Image;
+
+                    list[index].CountLikes = _context.Likes.Where(x => x.PostId == appPost.Id).Count();
+
+                    list[index].GroupImage = appPost.Group.Image;
+                    list[index].GroupName = appPost.Group.Title;
+
+                    index++;
+                }
+                
+                return Ok(list);
+            });
+        }
+
         //Custom Methods
         private void SetTags(string Tags, AppPost post)
         {
@@ -460,6 +520,14 @@ namespace Volonterio.Controllers
                     }
                 }
             }
+        }
+    }
+
+    class ComparerForPosts : IComparer<AppPost>
+    {
+        public int Compare(AppPost? x, AppPost? y)
+        {
+            return x.Id.CompareTo(y.Id);
         }
     }
 }

@@ -48,6 +48,21 @@
         public bool IsLiked { get; set; }
     }
 
+    public class GetPostByGroupIdSorted
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public List<string> Images { get; set; }
+        public string Tags { get; set; }
+        public string UserEmail { get; set; }
+        public string UserImage { get; set; }
+        public string UserName { get; set; }
+        public int CountLikes { get; set; }
+        public string GroupName { get; set; }
+        public string GroupImage { get; set; }
+    }
+
     public class IPublicationData
     {
         public int Id { get; set; }
