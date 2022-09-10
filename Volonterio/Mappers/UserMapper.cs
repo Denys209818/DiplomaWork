@@ -103,6 +103,7 @@ namespace Volonterio.Mappers
                 .ForMember(x => x.CountLikes, y => y.Ignore())
                 .ForMember(x => x.GroupImage, y => y.Ignore())
                 .ForMember(x => x.GroupName, y => y.Ignore())
+                .ForMember(x => x.DateCreated, y=> y.MapFrom(x => x.DateCreated))
                 ;
 
             CreateMap<AppGroup, GetGroupDataForMain>()

@@ -73,6 +73,7 @@
         public string Title { get; set; }
         public string Description { get; set; }
         public List<string> Images { get; set; }
+        public DateTime DateCreated { get; set; }
     }
 
     public class IPublicationData
