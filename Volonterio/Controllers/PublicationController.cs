@@ -292,7 +292,7 @@ namespace Volonterio.Controllers
             {
                 var userId = User.Claims.Where(x => x.Type == "id").First().Value;
 
-                var posts = _context.Post.Include(x => x.Images).Where(x => x.GroupId == id)
+                var posts = _context.Post.Include(x => x.Images).Where(x => x.GroupId == id).OrderByDescending(x => x.Id)
                 .Select(x => _mapper.Map<GetPostByGroupId>(x)).ToList();
 
               
@@ -508,8 +508,48 @@ namespace Volonterio.Controllers
                     item.GroupName = group.Title;
                     item.GroupImage = group.Image;
                     item.CountLikes = likes;
+                    
                 }
                 return Ok(list);
+            });
+        }
+
+
+        //getallpopularposts
+        [HttpGet]
+        [Route("getallpopularposts")]
+        public async Task<IActionResult> GetAllPopularPosts([FromQuery] int page)
+        {
+            return await Task.Run(() =>
+            {
+                int count = 6;
+                var list = _context.Post.Include(x => x.Images).Include(x => x.Likes)
+                .OrderByDescending(x => x.Likes.Count).Skip(count * page).Take(count).Select(x =>
+                _mapper.Map<GetPostByGroupIdSortedPopular>(x)).ToList();
+
+
+
+                foreach (var item in list)
+                {
+                    var group = _context.Groups.Include(x => x.Posts)
+                    .Where(x => x.Posts.Where(x => x.Id == item.Id).Any()).First();
+
+                    var likes = _context.Likes.Where(x => x.PostId == item.Id).Count();
+                    item.GroupName = group.Title;
+                    item.GroupImage = group.Image;
+                    item.CountLikes = likes;
+
+                }
+                return Ok(list);
+            });
+        }
+        [HttpGet]
+        [Route("getpostcount")]
+        public async Task<IActionResult> GetCountPublication()
+        {
+            return await Task.Run(() =>
+            {
+                return Ok(_context.Post.Count());
             });
         }
 
