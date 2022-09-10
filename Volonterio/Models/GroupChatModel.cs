@@ -12,5 +12,6 @@
         public string Text { get; set; }
         public DateTime Date { get; set; }
         public string Image { get; set; }
+        public string FullName { get; set; }
     }
 }

@@ -256,10 +256,20 @@ namespace Volonterio.Controllers
                     
                     
                     tags.AddRange(_context.Tags.Include(x => x.AppGroupTags)
-                    .Select(x => x.AppGroupTags.Where(x => x.GroupId == search.Id)
+                    .Select(x => x.AppGroupTags.Where(y => y != null).Where(y => y.GroupId == search.Id)
                     .First().Tag.Tag).ToList());
 
-                    string tag = string.Join("#",tags);
+                    //foreach (var tagItem in tags)
+                    //{
+                    //    if(tagItem == null)
+                    //    {
+                            
+                    //    }
+                    //}
+
+
+
+                    string tag = string.Join("#",tags.Where( x=> x!= null));
                     search.Tags = tag;
                 }
 
@@ -411,6 +421,30 @@ namespace Volonterio.Controllers
             });
         }
 
+        [HttpGet]
+        [Route("getpopulargroups")]
+        public async Task<IActionResult> GetPopularGroups([FromQuery] int items)
+        {
+            var userId = User.Claims.Where(x => x.Type == "id").First().Value;
+            return await Task.Run(() =>
+            {
+                var groups = _context.Groups.Include(x => x.UserGroups)
+                .OrderByDescending(x => x.UserGroups.Count).Take(items).Select(x => 
+                _mapper.Map<GetGroupDataForMain>(x)).ToList();
+                if (userId != null)
+                {
+
+                    foreach (var group in groups)
+                    {
+                        var correct = _context.Groups.First(y => y.Id == group.Id).UserId == long.Parse(userId); 
+                        group.IsSubscribed = _context.UserGroups.Where(x => (x.GroupId == group.Id &&
+                        x.UserId == long.Parse(userId))).Any() ||
+                        correct;
+                    }
+                }
+                return Ok(groups);
+            });
+        }
 
         //Custom Methods
         private void DeleteTags(int id)
@@ -495,6 +529,19 @@ namespace Volonterio.Controllers
                     System.IO.File.Delete(fullFileName);
                 }
             }
+        }
+
+        private string GetTagName(AppTag x, GroupReturn search)
+        {
+            var item = x.AppGroupTags.Where(y => y.GroupId == search.Id)
+                    .First();
+            if(item.Tag.Tag == null)
+            {
+                _context.GroupTags.Remove(item);
+                _context.SaveChanges();
+                return "";
+            }
+            return item.Tag.Tag;
         }
     }
 }

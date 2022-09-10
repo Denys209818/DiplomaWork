@@ -12,5 +12,6 @@
 
         public int GroupId { get; set; }
         public virtual AppGroup Group { get; set; }
+        public DateTime DateCreated { get; set; }
     }
 }

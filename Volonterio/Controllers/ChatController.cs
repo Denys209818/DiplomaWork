@@ -82,14 +82,16 @@ namespace Volonterio.Controllers
         {
             return await Task.Run(() =>
             {
-
+                
                 return Ok(_context.GroupMessages.Where(x => x.GroupId == groupId)
                     .Select(x => new GetMessage
                     {
                         Date = x.DateCreated,
                         Text = x.Message,
                         Image = _userManager.Users
-                        .Where(y => y.Id == x.UserId).First().Image
+                        .Where(y => y.Id == x.UserId).First().Image,
+                        FullName = _userManager.Users
+                        .Where(y => y.Id == x.UserId).First().Email
                     }));
             });
         }
@@ -154,5 +156,7 @@ namespace Volonterio.Controllers
                 return Ok();
             });
         }
+
+       
     }
 }

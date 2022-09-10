@@ -49,7 +49,7 @@ namespace Volonterio.Controllers
                 AppPost post = _mapper.Map<AppPost>(create);
 
                 post.Group = group;
-
+                post.DateCreated = DateTime.Now;
                 _context.Post.Add(post);
                 _context.SaveChanges();
 
@@ -442,10 +442,12 @@ namespace Volonterio.Controllers
                     .Where(y => y.GroupId == x.Id &&
                     y.UserId == userId).Any() || x.UserId == userId).ToList().Select(x => x.Id).ToList();
                 List<AppPost> appPosts = new List<AppPost>();
+                var date = DateTime.Now;
                 foreach (var groupId in groupsId)
                 {
-                    var posts = _context.Post.Include(x=> x.PostTagEntities)
-                    .Include(x => x.Images).Include(x => x.Group).Where(x => x.GroupId == groupId).ToList();
+                    var posts = _context.Post.Where(x => x.DateCreated.Year == date.Year &&
+                    x.DateCreated.Month == date.Month && (x.DateCreated.Day - date.Day) < 4).Include(x=> x.PostTagEntities)
+                    .Include(x => x.Images).Include(x => x.Group).Where(x => x.GroupId == groupId);
                     appPosts.AddRange(posts);
 
                 }

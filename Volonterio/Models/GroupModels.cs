@@ -64,4 +64,14 @@
         public string Description { get; set; }
         public string Image { get; set; }
     }
+
+    public class GetGroupDataForMain
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public int SubscribersCount { get; set; }
+        public string Image { get; set; }
+        public bool IsSubscribed { get; set; }
+    }
 }

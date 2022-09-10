@@ -104,6 +104,15 @@ namespace Volonterio.Mappers
                 .ForMember(x => x.GroupImage, y => y.Ignore())
                 .ForMember(x => x.GroupName, y => y.Ignore())
                 ;
+
+            CreateMap<AppGroup, GetGroupDataForMain>()
+                .ForMember(x => x.Id, y => y.MapFrom(x => x.Id))
+                .ForMember(x => x.Title, y => y.MapFrom(x => x.Title))
+                .ForMember(x => x.Description, y => y.MapFrom(x => x.Description))
+                .ForMember(x => x.Image, y => y.MapFrom(x => x.Image))
+                .ForMember(x => x.IsSubscribed, y => y.MapFrom(x => false))
+                .ForMember(x => x.SubscribersCount, y => y.MapFrom(x => x.UserGroups.Count +1))
+                ;
         }
     }
 }
