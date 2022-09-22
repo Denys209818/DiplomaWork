@@ -15,7 +15,6 @@ using Volonterio.Data.Entities;
 using Volonterio.Data.Services;
 using Volonterio.Mappers;
 using Volonterio.Services;
-
 var builder = WebApplication.CreateBuilder(args);
 
     builder.WebHost
@@ -48,11 +47,13 @@ builder.Services.AddIdentity<AppUser, AppRole>((IdentityOptions opts) => {
     .AddEntityFrameworkStores<EFContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddAuthentication((AuthenticationOptions opts) => {
+builder.Services.AddAuthentication((AuthenticationOptions opts) =>
+{
     opts.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     opts.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-    .AddJwtBearer((JwtBearerOptions jwt) => {
+    .AddJwtBearer((JwtBearerOptions jwt) =>
+    {
         jwt.RequireHttpsMetadata = false;
         jwt.SaveToken = true;
         jwt.TokenValidationParameters = new TokenValidationParameters
@@ -65,7 +66,12 @@ builder.Services.AddAuthentication((AuthenticationOptions opts) => {
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                 builder.Configuration.GetValue<string>("private_key")))
         };
-    });
+    }).AddGoogle(opt =>
+    {
+        opt.ClientId = builder.Configuration.GetSection("ClientId").Value;
+        opt.ClientSecret = builder.Configuration.GetSection("ClientSecret").Value;
+        opt.SignInScheme = IdentityConstants.ExternalScheme;
+    }); ;
 
 builder.Services.AddScoped<IJwtBearerService, JwtBearerService>();
 builder.Services.AddAutoMapper(typeof(UserMapper));

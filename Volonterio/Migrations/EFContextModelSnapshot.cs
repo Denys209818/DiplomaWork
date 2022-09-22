@@ -242,6 +242,9 @@ namespace Volonterio.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsFriend")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("UserFriendId")
                         .HasColumnType("integer");
 
@@ -500,6 +503,9 @@ namespace Volonterio.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsFriend")
+                        .HasColumnType("boolean");
+
                     b.HasKey("Id");
 
                     b.ToTable("tblAppUserFriend", (string)null);
@@ -536,7 +542,7 @@ namespace Volonterio.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("tblFriendChat");
+                    b.ToTable("tblFriendChat", (string)null);
                 });
 
             modelBuilder.Entity("Volonterio.Models.GroupChatModels", b =>
@@ -553,7 +559,7 @@ namespace Volonterio.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("tblGroupChat");
+                    b.ToTable("tblGroupChat", (string)null);
                 });
 
             modelBuilder.Entity("Volonterio.Models.GroupsModels", b =>
@@ -578,7 +584,7 @@ namespace Volonterio.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("tblGroups");
+                    b.ToTable("tblGroups", (string)null);
                 });
 
             modelBuilder.Entity("Volonterio.Models.MessageModels", b =>
@@ -607,7 +613,7 @@ namespace Volonterio.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("tblMessage");
+                    b.ToTable("tblMessage", (string)null);
                 });
 
             modelBuilder.Entity("Volonterio.Models.PublicationsModels", b =>
@@ -637,7 +643,7 @@ namespace Volonterio.Migrations
 
                     b.HasIndex("GroupsId");
 
-                    b.ToTable("tblPublications");
+                    b.ToTable("tblPublications", (string)null);
                 });
 
             modelBuilder.Entity("Volonterio.Models.PublicationsTagsModel", b =>
@@ -652,7 +658,7 @@ namespace Volonterio.Migrations
 
                     b.HasIndex("TegsId");
 
-                    b.ToTable("tblPublicationsTags");
+                    b.ToTable("tblPublicationsTags", (string)null);
                 });
 
             modelBuilder.Entity("Volonterio.Models.TagsModels", b =>
@@ -670,7 +676,7 @@ namespace Volonterio.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("tblTags");
+                    b.ToTable("tblTags", (string)null);
                 });
 
             modelBuilder.Entity("Volonterio.Models.UsersModels", b =>
@@ -713,7 +719,7 @@ namespace Volonterio.Migrations
 
                     b.HasIndex("GroupsId");
 
-                    b.ToTable("tblUsers");
+                    b.ToTable("tblUsers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>

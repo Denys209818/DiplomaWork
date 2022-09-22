@@ -425,13 +425,18 @@ namespace Volonterio.Controllers
         [Route("getpopulargroups")]
         public async Task<IActionResult> GetPopularGroups([FromQuery] int items)
         {
-            var userId = User.Claims.Where(x => x.Type == "id").First().Value;
+            string userId = null;
+            var userObj = User.Claims.Where(x => x.Type == "id").FirstOrDefault();
+            if (userObj != null)
+            {
+                 userId = User.Claims.Where(x => x.Type == "id").First().Value;
+            }
             return await Task.Run(() =>
             {
                 var groups = _context.Groups.Include(x => x.UserGroups)
                 .OrderByDescending(x => x.UserGroups.Count).Take(items).Select(x => 
                 _mapper.Map<GetGroupDataForMain>(x)).ToList();
-                if (userId != null)
+                if (!string.IsNullOrEmpty(userId))
                 {
 
                     foreach (var group in groups)
