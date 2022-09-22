@@ -114,6 +114,12 @@ namespace Volonterio.Mappers
                 .ForMember(x => x.IsSubscribed, y => y.MapFrom(x => false))
                 .ForMember(x => x.SubscribersCount, y => y.MapFrom(x => x.UserGroups.Count +1))
                 ;
+
+            CreateMap<AppUser, ReturnedSearchUser>()
+                .ForMember(x => x.Email, y => y.MapFrom(z => z.Email))
+                .ForMember(x => x.FullName, y => y.MapFrom(z => z.FirstName + " " + z.SecondName))
+                .ForMember(x => x.Image, y => y.MapFrom(z => z.Image))
+                .ForMember(x => x.IsFriend, y => y.MapFrom(z => false));
         }
     }
 }

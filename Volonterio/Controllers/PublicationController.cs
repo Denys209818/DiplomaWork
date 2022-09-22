@@ -49,7 +49,7 @@ namespace Volonterio.Controllers
                 AppPost post = _mapper.Map<AppPost>(create);
 
                 post.Group = group;
-                post.DateCreated = DateTime.Now;
+                post.DateCreated = DateTime.Now.ToUniversalTime();
                 _context.Post.Add(post);
                 _context.SaveChanges();
 
@@ -467,10 +467,11 @@ namespace Volonterio.Controllers
                         string tag = item.Tag;
                         postTags.Add(tag);
                     }
+                    
 
                     string readyTags = string.Concat(postTags.Select(x => "#" + x + " ")).Trim();
                     list[index].Tags = readyTags;
-                    var userObj = _userManager.FindByIdAsync(userId.ToString()).Result;
+                    var userObj = _userManager.FindByIdAsync(appPost.Group.UserId.ToString()).Result;
                     list[index].UserName = userObj.FirstName + " " + userObj.SecondName;
                     list[index].UserEmail = userObj.Email;
                     list[index].UserImage = userObj.Image;

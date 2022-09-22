@@ -1,16 +1,19 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Google.Apis.Auth;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Volonterio.Data.Entities;
+using Volonterio.Models;
 
 namespace Volonterio.Services
 {
     public interface IJwtBearerService
     {
         public string GenerateToken(AppUser user);
+        Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(ExternalLoginRequest request);
     }
 
     public class JwtBearerService : IJwtBearerService
@@ -48,6 +51,17 @@ namespace Volonterio.Services
 
             string token = new JwtSecurityTokenHandler().WriteToken(jwt);
             return token;
+        }
+
+        public async Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(ExternalLoginRequest request)
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string>() { _configuration.GetSection("ClientId").Value }
+            };
+
+            var payload = await GoogleJsonWebSignature.ValidateAsync(request.Token, settings);
+            return payload;
         }
     }
 }

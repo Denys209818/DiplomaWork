@@ -47,6 +47,7 @@
         public string Phone { get; set; }
         public string Image { get; set; }
         public string ChatId { get; set; }
+        public bool IsFriend { get; set; } = false;
     }
 
     public class FriendMessageInfo
@@ -72,5 +73,19 @@
         public int PostsCount { get; set; }
         public int GroupsCount { get; set; }
         public int FriendsCount { get; set; }
+    }
+
+    public class ExternalLoginRequest
+    {
+        public string Provider { get; set; }
+        public string Token { get; set; }
+    }
+
+    public class ReturnedSearchUser
+    {
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string Image { get; set; }
+        public bool IsFriend { get; set; }
     }
 }
